@@ -1,8 +1,8 @@
 {
-  "name": "lovelace-card-boilerplate",
+  "name": "github-flexi-card",
   "version": "0.1.0",
-  "description": "Lovelace card boilerplate",
-  "main": "dist/my-custom-card.js",
+  "description": "Home assistant github card",
+  "main": "dist/github-flexi-card.js",
   "scripts": {
     "prebuild": "node build/prebuild.js",
     "build": "rollup -c",
@@ -11,21 +11,22 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/maxwroc/lovelace-card-boilerplate.git"
+    "url": "git+https://github.com/maxwroc/github-flexi-card.git"
   },
   "keywords": [
-    "lovelace",
+    "github",
     "card",
-    "boilerplate",
+    "flexi",
     "home",
-    "assistant"
+    "assistant",
+    "lovelace"
   ],
   "author": "Max Chodorowski",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/maxwroc/lovelace-card-boilerplate/issues"
+    "url": "https://github.com/maxwroc/github-flexi-card/issues"
   },
-  "homepage": "https://github.com/maxwroc/lovelace-card-boilerplate#readme",
+  "homepage": "https://github.com/maxwroc/github-flexi-card#readme",
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^6.0.0",

@@ -3,7 +3,7 @@ import { HomeAssistant } from "./ha-types";
 import { ICardConfig } from "./types";
 import styles from "./styles";
 
-class MyCustomCard extends LitElement {
+class GithubFlexiCard extends LitElement {
 
     private header: string = "Card header";
 
@@ -52,6 +52,4 @@ class MyCustomCard extends LitElement {
 }
 
 // Registering card
-customElements.define("my-custom-card", MyCustomCard);
-
-console.log("my-custom-card");
+customElements.define("github-flexi-card", GithubFlexiCard);
