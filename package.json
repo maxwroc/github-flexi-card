@@ -7,7 +7,8 @@
     "prebuild": "node build/prebuild.js",
     "build": "rollup -c",
     "prerelease": "node build/prebuild.js",
-    "release": "rollup --release -c"
+    "release": "rollup --release -c",
+    "test": "npm run build && copy dist\\github-flexi-card.js ..\\lovelace-card-tester\\docs\\cards"
   },
   "repository": {
     "type": "git",
