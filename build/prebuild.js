@@ -31,9 +31,10 @@ const minimizeCss =  content => {
 }
 
 const compileCss = async () => {
-    const cssCode = await readFile("src/styles.css");
+    const cssFile = "src/custom-elements/styles.css";
+    const cssCode = await readFile(cssFile);
 
-    return await writeFile("src/styles.ts", 'import { css } from "./lit-element"; const styles = css`' + minimizeCss(cssCode) + '`; export default styles;');
+    return await writeFile(cssFile.replace(".css", ".ts"), 'import { css } from "../lit-element"; const styles = css`' + minimizeCss(cssCode) + '`; export default styles;');
 };
 
 

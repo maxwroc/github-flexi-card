@@ -1,9 +1,30 @@
 import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
-import { IEntityConfig } from "../types";
+import { IEntityConfig, IAttribute } from "../types";
 
-const replaceKeywordsWithData = (text: string, data: { [key: string]: string }) =>
+const replaceKeywordsWithData = (text: string, data: IMap<string>) =>
     text.replace(/\{([a-z]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
+
+const nameToIconMap: IMap<string> = {
+    "open_issues": "mdi:alert-circle-outline",
+    "open_pull_requests": "mdi:source-pull",
+    "stargazers": "mdi:star",
+    "forks": "mdi:source-fork",
+    "latest_release_tag": "mdi:tag-outline",
+    "clones": "mdi:download-outline",
+    "clones_unique": "mdi:download-outline",
+    "views": "mdi:eye",
+    "views_unique": "mdi:eye-check",
+}
+
+const getStats = (attrib: IAttribute[], data: IMap<string>): IStat[] =>
+    attrib.map(a => {
+        return {
+            icon: a.icon || nameToIconMap[a.name],
+            label: a.label && replaceKeywordsWithData(a.label, data),
+            url: a.url && replaceKeywordsWithData(a.url, data),
+        }
+    });
 
 export class GithubEntity extends LitElement {
 
@@ -15,11 +36,14 @@ export class GithubEntity extends LitElement {
 
     private secondaryInfo: string = <any>null;
 
+    private stats: IStat[] = [];
+
     static get properties() {
         return {
             icon: { type: String },
             name: { type: String },
             secondaryInfo: { type: String },
+            stats: { type: Array },
         };
     }
 
@@ -41,6 +65,12 @@ export class GithubEntity extends LitElement {
 
         if (this.config.secondary_info) {
             this.secondaryInfo = replaceKeywordsWithData(this.config.secondary_info, entityData.attributes);
+        }
+
+        const newStats = getStats(this.config.attributes || [], entityData.attributes);
+        // check to avoid unnecessary re-rendering
+        if (JSON.stringify(newStats) != JSON.stringify(this.stats)) {
+            this.stats = newStats;
         }
     }
 
@@ -73,10 +103,18 @@ export class GithubEntity extends LitElement {
             ${this.name}
             ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
         </div>
-        <div class="state">
-            State
-        </div>
+        ${this.stats.map(s => html`<div class="state"><ha-icon icon="${s.icon}"></ha-icon> <span>${s.label}</span></div>`)}
     <div>
     `;
     }
+}
+
+interface IMap<T> {
+    [key: string]: T
+}
+
+interface IStat {
+    icon?: string,
+    label?: string,
+    url?: string,
 }

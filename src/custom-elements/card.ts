@@ -1,8 +1,8 @@
 import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
-import styles from "../styles";
 import { ICardConfig } from "../types";
 import { GithubEntity } from "./entity";
+import styles from "./styles";
 
 export class GithubFlexiCard extends LitElement {
 

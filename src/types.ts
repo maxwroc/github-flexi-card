@@ -11,7 +11,7 @@ export interface IEntityConfig {
     icon?: string,
 }
 
-interface IAttribute {
+export interface IAttribute {
     name: string,
     icon?: string,
     label?: string,
