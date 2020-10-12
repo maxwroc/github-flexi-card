@@ -37,5 +37,17 @@ const compileCss = async () => {
     return await writeFile(cssFile.replace(".css", ".ts"), 'import { css } from "../lit-element"; const styles = css`' + minimizeCss(cssCode) + '`; export default styles;');
 };
 
+// Updates version printed in console window
+const updateVersion = async () => {
+    const filePath = "src/utils.ts";
+    const pkg = require("./../package.json");
+    const utils = await readFile(filePath);
+    const updatedUtils = utils.replace(/"%c GITHUB-FLEXI-CARD %c [0-9]+.[0-9]+.[0-9]+"/gm, `"%c GITHUB-FLEXI-CARD %c ${pkg.version}"`);
+    if (utils !== updatedUtils) {
+        await writeFile(filePath, updatedUtils);
+    }
+}
+
 
 compileCss();
+updateVersion();
