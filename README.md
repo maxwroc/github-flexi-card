@@ -5,7 +5,7 @@ Home Assistant card displaying data from [Github integration](https://www.home-a
 
 The aim of this card is to show all the data provided by github integration. You can specify what kind of data is shown and where. Entity rows are matching the size of other standard entity rows from other native cards (e.g. height of the row, icon/text margins, font sizes, etc).
 
-![image](https://user-images.githubusercontent.com/8268674/95760202-a2c53300-0ca2-11eb-8bb5-be1d0037fb85.png)
+![image](https://user-images.githubusercontent.com/8268674/95763370-d904b180-0ca6-11eb-9951-56c8200ee025.png)
 
 Example configuration
 ```yaml
@@ -27,7 +27,7 @@ entities:
       - name: stargazers
       - name: forks
   - entity_id: sensor.urleditorpro
-    name: Url Editor Pro
+    name: 'Url Editor Pro (v{latest_release_tag})'
     secondary_info: 'Clones: {clones}'
     attributes:
       - name: views

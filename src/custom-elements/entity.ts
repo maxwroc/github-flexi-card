@@ -2,8 +2,8 @@ import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IAttribute } from "../types";
 
-const replaceKeywordsWithData = (text: string, data: IMap<string>) =>
-    text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
+const replaceKeywordsWithData = (data: IMap<string>, text?: string) =>
+    text && text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
 
 const nameToIconMap: IMap<string> = {
     "open_issues": "mdi:alert-circle-outline",
@@ -22,8 +22,8 @@ const getStats = (attrib: IAttribute[], data: IMap<string>): IStat[] =>
         return {
             value: data[a.name],
             icon: a.icon || nameToIconMap[a.name],
-            label: a.label && replaceKeywordsWithData(a.label, data),
-            url: a.url && replaceKeywordsWithData(a.url, data),
+            label: a.label && replaceKeywordsWithData(data, a.label),
+            url: a.url && replaceKeywordsWithData(data, a.url),
         }
     });
 
@@ -61,11 +61,11 @@ export class GithubEntity extends LitElement {
             return;
         }
 
-        this.name = this.config.name || entityData.attributes["friendly_name"];
+        this.name = replaceKeywordsWithData(entityData.attributes, this.config.name) || entityData.attributes["friendly_name"];
         this.icon = this.config.icon || entityData.attributes["icon"];
 
         if (this.config.secondary_info) {
-            this.secondaryInfo = replaceKeywordsWithData(this.config.secondary_info, entityData.attributes);
+            this.secondaryInfo = replaceKeywordsWithData(entityData.attributes, this.config.secondary_info) as string;
         }
 
         const newStats = getStats(this.config.attributes || [], entityData.attributes);
