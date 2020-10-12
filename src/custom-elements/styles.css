@@ -1,3 +1,5 @@
+
+
 .truncate {
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -25,8 +27,39 @@
 }
 .entity-row .icon {
     flex: 0 0 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border-radius: 50%;
     text-align: center;
-    line-height: 40px;
+    height: 40px;
     margin-right: 10px;
+}
+
+.state {
+    --mdc-icon-size: 20px;
+    display: flex;
+    margin-left: 7px;
+}
+.state > * {
+    margin-left:5px;
+}
+.state > *:first-child {
+    margin-left: 0;
+}
+.state > div {
+    font-size: var(--paper-font-caption_-_font-size);
+    line-height: 24px;
+}
+
+.compact-view .state {
+    flex-direction: column;
+    align-items: center;
+    margin-left: 10px;
+}
+.compact-view .state > div {
+    line-height: normal;
+}
+.compact-view .state > * {
+    margin: 0;
 }

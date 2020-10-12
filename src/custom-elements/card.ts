@@ -35,7 +35,7 @@ export class GithubFlexiCard extends LitElement {
             this.entities = config.entities.map(entity => {
                 const elem = document.createElement("github-entity") as GithubEntity;
                 elem.setConfig(entity);
-                return document.createElement("github-entity") as GithubEntity;
+                return elem;
             })
         }
         else {

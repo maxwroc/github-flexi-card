@@ -3,7 +3,7 @@ import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IAttribute } from "../types";
 
 const replaceKeywordsWithData = (text: string, data: IMap<string>) =>
-    text.replace(/\{([a-z]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
+    text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
 
 const nameToIconMap: IMap<string> = {
     "open_issues": "mdi:alert-circle-outline",
@@ -20,6 +20,7 @@ const nameToIconMap: IMap<string> = {
 const getStats = (attrib: IAttribute[], data: IMap<string>): IStat[] =>
     attrib.map(a => {
         return {
+            value: data[a.name],
             icon: a.icon || nameToIconMap[a.name],
             label: a.label && replaceKeywordsWithData(a.label, data),
             url: a.url && replaceKeywordsWithData(a.url, data),
@@ -93,19 +94,17 @@ export class GithubEntity extends LitElement {
 
     render() {
         return html`
-    <div class="entity-row">
-        <div class="icon">
-            <ha-icon
-                icon="${this.icon}"
-            ></ha-icon>
-        </div>
-        <div class="name truncate">
-            ${this.name}
-            ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
-        </div>
-        ${this.stats.map(s => html`<div class="state"><ha-icon icon="${s.icon}"></ha-icon> <span>${s.label}</span></div>`)}
-    <div>
-    `;
+        <div class="entity-row compact-view">
+            <div class="icon">
+                <ha-icon icon="${this.icon}"></ha-icon>
+            </div>
+            <div class="name truncate">
+                ${this.name}
+                ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
+            </div>
+            ${this.stats.map(s => html`<div class="state"><ha-icon icon="${s.icon}" style="color: var(--primary-color)"></ha-icon><div>${s.value}</div></div>`)}
+        <div>
+        `;
     }
 }
 
@@ -114,6 +113,7 @@ interface IMap<T> {
 }
 
 interface IStat {
+    value: string,
     icon?: string,
     label?: string,
     url?: string,
