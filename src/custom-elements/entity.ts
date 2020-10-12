@@ -34,6 +34,7 @@ const nameToUrlPathMap: IMap<string> = {
     "clones_unique": "graphs/traffic",
     "views": "graphs/traffic",
     "views_unique": "graphs/traffic",
+    "home": ""
 }
 
 /**
@@ -51,7 +52,7 @@ const getAction = (attributeName: string, url: boolean | string | undefined, dat
                 return undefined;
             }
 
-            if (!nameToUrlPathMap[attributeName]) {
+            if (!nameToUrlPathMap[attributeName] === undefined) {
                 logError(`Sorry url cannot be built for "${attributeName}"`);
                 return undefined;
             }
@@ -69,7 +70,10 @@ const getAction = (attributeName: string, url: boolean | string | undefined, dat
     return undefined;
 }
 
-const getStats = (attrib: IAttribute[], data: IMap<string>): IStat[] =>
+/**
+ * Gets list of attributes data to render
+ */
+const getAttributesViewData = (attrib: IAttribute[], data: IMap<string>): IAttributeViewData[] =>
     attrib.map(a => {
         return {
             value: data[a.name],
@@ -89,7 +93,11 @@ export class GithubEntity extends LitElement {
 
     private secondaryInfo: string = <any>null;
 
-    private stats: IStat[] = [];
+    private attributesData: IAttributeViewData[] = [];
+
+    private action: Function | undefined;
+
+    private url: string | boolean | undefined;
 
     static get properties() {
         return {
@@ -97,6 +105,7 @@ export class GithubEntity extends LitElement {
             name: { type: String },
             secondaryInfo: { type: String },
             stats: { type: Array },
+            action: { type: Function },
         };
     }
 
@@ -120,10 +129,16 @@ export class GithubEntity extends LitElement {
             this.secondaryInfo = replaceKeywordsWithData(entityData.attributes, this.config.secondary_info) as string;
         }
 
-        const newStats = getStats(this.config.attributes || [], entityData.attributes);
+        const newStats = getAttributesViewData(this.config.attributes || [], entityData.attributes);
         // check to avoid unnecessary re-rendering
-        if (JSON.stringify(newStats) != JSON.stringify(this.stats)) {
-            this.stats = newStats;
+        if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
+            this.attributesData = newStats;
+        }
+
+        // check whether we need to update the action
+        if (this.url != this.config.url) {
+            this.url = this.config.url;
+            this.action = getAction("home", this.url, entityData.attributes);
         }
     }
 
@@ -131,13 +146,15 @@ export class GithubEntity extends LitElement {
         const oldConfig = JSON.stringify(this.config);
         const newConfig = JSON.stringify(config);
 
-        if (oldConfig != newConfig) {
-            this.config = config;
-
-            this.name = config.name || config.entity_id;
-            config.icon && (this.icon = config.icon);
-            config.secondary_info && (this.secondaryInfo = config.secondary_info);
+        if (oldConfig == newConfig) {
+            return;
         }
+
+        this.config = config;
+
+        this.name = config.name || config.entity_id;
+        config.icon && (this.icon = config.icon);
+        config.secondary_info && (this.secondaryInfo = config.secondary_info);
     }
 
     createRenderRoot() {
@@ -150,11 +167,11 @@ export class GithubEntity extends LitElement {
             <div class="icon">
                 <ha-icon icon="${this.icon}"></ha-icon>
             </div>
-            <div class="name truncate">
+            <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
                 ${this.name}
                 ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
             </div>
-            ${this.stats.map(s => html`<div class="state${s.action ? " clickable" : ""}" @click="${s.action}"><ha-icon icon="${s.icon}" style="color: var(--primary-color)"></ha-icon><div>${s.value}</div></div>`)}
+            ${this.attributesData.map(s => html`<div class="state${s.action ? " clickable" : ""}" @click="${s.action}"><ha-icon icon="${s.icon}" style="color: var(--primary-color)"></ha-icon><div>${s.value}</div></div>`)}
         <div>
         `;
     }
@@ -164,7 +181,7 @@ interface IMap<T> {
     [key: string]: T
 }
 
-interface IStat {
+interface IAttributeViewData {
     value: string,
     icon?: string,
     label?: string,

@@ -9,6 +9,7 @@ export interface IEntityConfig {
     name?: string,
     secondary_info?: string,
     icon?: string,
+    url?: string | boolean,
 }
 
 export interface IAttribute {
