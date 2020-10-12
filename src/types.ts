@@ -15,5 +15,5 @@ export interface IAttribute {
     name: string,
     icon?: string,
     label?: string,
-    url?: string,
+    url?: string | boolean,
 }
