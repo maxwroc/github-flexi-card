@@ -24,14 +24,15 @@ The aim of this card is to show all the data provided by github integration. You
 | name | [KString](#keywordstring) |  | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
 | attributes | [Attribute](#attribute)[] |  | v0.1.0 | Attributes to display
-| url | [KString](#keywordstring) \| Bool |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
+| url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
+| attribute_urls | Boolean |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
 
 ### Attribute
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | name | String | **(required)** | v0.1.0 | Name of the attribute
 | icon | String |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
-| url | [KString](#keywordstring) \| Bool |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
+| url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
 
 ### KeywordString
 
@@ -75,7 +76,7 @@ entities:
       - name: open_issues
 ```
 
-### How to install?
+## How to install?
 
 Install HACS and add this repo as custom repository (lovelace plugins). Click on "Install".
 

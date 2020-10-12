@@ -73,13 +73,17 @@ const getAction = (attributeName: string, url: boolean | string | undefined, dat
 /**
  * Gets list of attributes data to render
  */
-const getAttributesViewData = (attrib: IAttribute[], data: IMap<string>): IAttributeViewData[] =>
-    attrib.map(a => {
+const getAttributesViewData = (config: IEntityConfig, data: IMap<string>): IAttributeViewData[] =>
+    (config.attributes || []).map(a => {
         return {
             value: data[a.name],
             icon: a.icon || nameToIconMap[a.name],
             label: a.label && replaceKeywordsWithData(data, a.label),
-            action: getAction(a.name, a.url, data),
+            action: getAction(
+                a.name,
+                // if attrib url property is missing use the entity-level setting
+                a.url !== undefined ? a.url : config.attribute_urls,
+                data),
         }
     });
 
@@ -129,7 +133,7 @@ export class GithubEntity extends LitElement {
             this.secondaryInfo = replaceKeywordsWithData(entityData.attributes, this.config.secondary_info) as string;
         }
 
-        const newStats = getAttributesViewData(this.config.attributes || [], entityData.attributes);
+        const newStats = getAttributesViewData(this.config, entityData.attributes);
         // check to avoid unnecessary re-rendering
         if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
             this.attributesData = newStats;
@@ -150,7 +154,8 @@ export class GithubEntity extends LitElement {
             return;
         }
 
-        this.config = config;
+        // we cannot just assign the config because it is immutable and we want to change it
+        this.config = JSON.parse(newConfig);
 
         this.name = config.name || config.entity_id;
         config.icon && (this.icon = config.icon);
