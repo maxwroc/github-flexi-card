@@ -24,6 +24,7 @@ The aim of this card is to show all the data provided by github integration. You
 | name | [KString](#keywordstring) |  | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
 | attributes | [Attribute](#attribute)[] |  | v0.1.0 | Attributes to display
+| url | [KString](#keywordstring) \| Bool |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
 
 ### Attribute
 | Name | Type | Default | Since | Description |
