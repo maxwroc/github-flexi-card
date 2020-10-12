@@ -41,7 +41,7 @@ E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
 ![image](https://user-images.githubusercontent.com/8268674/95771623-4ddde880-0cb3-11eb-9265-57876a08bd6e.png)
 
-### Example configuration
+## Configuration example
 
 ```yaml
 type: 'custom:github-flexi-card'
