@@ -21,8 +21,8 @@ The aim of this card is to show all the data provided by github integration. You
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | entity_id | String | **(required)** | v0.1.0 | Entity ID e.g. `sensor.my_github_project`
-| name | [KeywordString](#keywordstring) |  | v0.1.0 | Name override
-| secondary_info | [KeywordString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
+| name | [KString](#keywordstring) |  | v0.1.0 | Name override
+| secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
 | attributes | [Attribute](#attribute)[] |  | v0.1.0 | Attributes to display
 
 ### Attribute
@@ -30,6 +30,7 @@ The aim of this card is to show all the data provided by github integration. You
 |:-----|:-----|:-----|:-----|:-----|
 | name | String | **(required)** | v0.1.0 | Name of the attribute
 | icon | String |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
+| url | [KString](#keywordstring) \| Bool |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
 
 ### KeywordString
 

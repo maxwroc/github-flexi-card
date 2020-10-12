@@ -42,6 +42,10 @@ const nameToUrlPathMap: IMap<string> = {
 const getAction = (attributeName: string, url: boolean | string | undefined, data: IMap<string>): Function | undefined => {
     switch (typeof url) {
         case "boolean":
+            if (!url) {
+                return undefined;
+            }
+
             if (!data["path"]) {
                 logError(`Cannot build url - entity path attribute is missing`);
                 return undefined;
