@@ -39,7 +39,8 @@ E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
 ![image](https://user-images.githubusercontent.com/8268674/95771623-4ddde880-0cb3-11eb-9265-57876a08bd6e.png)
 
-Example configuration
+### Example configuration
+
 ```yaml
 type: 'custom:github-flexi-card'
 title: Github projects
@@ -65,4 +66,16 @@ entities:
       - name: views
       - name: stargazers
       - name: open_issues
+```
+
+### How to install?
+
+Install HACS and add this repo as custom repository (lovelace plugins). Click on "Install".
+
+If you have a YAML mode remember to add resource entry for the js bundle in ui-lovelace.yaml:
+
+```yaml
+resources:
+  - url: /hacsfiles/github-flexi-card/github-flexi-card.js
+    type: module
 ```
