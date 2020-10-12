@@ -49,14 +49,19 @@ title: Github projects
 entities:
   - entity_id: sensor.battery_state_card
     secondary_info: 'Released {latest_release_tag}'
+    url: "{latest_release_url}" # url taken from attribute
     attributes:
       - name: views
+        url: true # default url to graphs/traffic
       - name: stargazers
       - name: open_issues
       - name: clones
+        url: "https://my.custom.url/path"
       - name: forks
       - name: open_pull_requests
+        url: "{latest_open_pull_request_url}" # url taken from attribute
   - entity_id: sensor.hideseek_mod
+    url: true # default url - repo homepage
     attributes:
       - name: views
       - name: stargazers
