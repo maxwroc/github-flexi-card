@@ -5,15 +5,17 @@ export interface ICardConfig {
 
 export interface IEntityConfig {
     entity_id: string,
-    attributes: IAttribute[],
+    attributes?: IAttribute[],
     name?: string,
     secondary_info?: string,
     icon?: string,
+    url?: string | boolean,
+    attribute_urls?: boolean,
 }
 
 export interface IAttribute {
     name: string,
     icon?: string,
     label?: string,
-    url?: string,
+    url?: string | boolean,
 }
