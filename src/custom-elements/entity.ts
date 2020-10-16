@@ -4,6 +4,18 @@ import { IEntityConfig, IAttribute } from "../types";
 import { logError } from "../utils";
 import styles from "./entity-styles";
 
+interface IMap<T> {
+    [key: string]: T
+}
+
+interface IAttributeViewData {
+    value: string,
+    tooltip: string,
+    icon?: string,
+    label?: string,
+    action?: Function,
+}
+
 export class GithubEntity extends LitElement {
 
     private config: IEntityConfig = <any>null;
@@ -101,23 +113,19 @@ export class GithubEntity extends LitElement {
                 ${this.name}
                 ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
             </div>
-            ${this.attributesData.map(s => html`<div class="state${s.action ? " clickable" : ""}" @click="${s.action}"><ha-icon icon="${s.icon}" style="color: var(--primary-color)"></ha-icon><div>${s.value}</div></div>`)}
+            ${this.attributesData.map(attributeView)}
         <div>
         `;
     }
 }
 
-interface IMap<T> {
-    [key: string]: T
-}
-
-interface IAttributeViewData {
-    value: string,
-    icon?: string,
-    label?: string,
-    action?: Function,
-}
-
+const attributeView = (attr: IAttributeViewData) => html`
+<div class="state${attr.action ? " clickable" : ""}" @click="${attr.action}" title="${attr.tooltip}">
+    <ha-icon icon="${attr.icon}" style="color: var(--primary-color)">
+    </ha-icon>
+    <div>${attr.value}</div>
+</div>
+`;
 
 const replaceKeywordsWithData = (data: IMap<string>, text?: string) =>
     text && text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
@@ -193,6 +201,7 @@ const getAttributesViewData = (config: IEntityConfig, data: IMap<string>): IAttr
     (config.attributes || []).map(a => {
         return {
             value: data[a.name],
+            tooltip: attributeNameToTooltip(a.name),
             icon: a.icon || nameToIconMap[a.name],
             label: a.label && replaceKeywordsWithData(data, a.label),
             action: getAction(
@@ -202,3 +211,5 @@ const getAttributesViewData = (config: IEntityConfig, data: IMap<string>): IAttr
                 data),
         }
     });
+
+const attributeNameToTooltip = (name: string): string => name.substr(0, 1).toUpperCase() + name.substr(1).replace(/_/g, " ");
