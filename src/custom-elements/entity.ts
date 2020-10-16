@@ -91,7 +91,7 @@ export class GithubEntity extends LitElement {
 
     private config: IEntityConfig = <any>null;
 
-    private icon: string = "mdi:lightbulb";
+    private icon: string = "mdi:github";
 
     private name: string = "";
 
@@ -115,14 +115,13 @@ export class GithubEntity extends LitElement {
 
     set hass(hass: HomeAssistant) {
 
-        if (!this.config.entity) {
-            console.error("[github-flexi-card] Missing entity_id property in entity configuration");
+        if (!this.config) {
             return;
         }
 
         const entityData = hass.states[this.config.entity];
         if (!entityData) {
-            console.error("[github-flexi-card] Entity not found: " + this.config.entity);
+            logError("Entity not found: " + this.config.entity);
             return;
         }
 
@@ -151,6 +150,11 @@ export class GithubEntity extends LitElement {
         const newConfig = JSON.stringify(config);
 
         if (oldConfig == newConfig) {
+            return;
+        }
+
+        if (!config.entity) {
+            logError("Missing 'entity' property in entity configuration");
             return;
         }
 
