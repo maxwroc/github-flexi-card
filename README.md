@@ -7,6 +7,9 @@ The aim of this card is to show all the data provided by github integration. You
 
 ![image](https://user-images.githubusercontent.com/8268674/95763370-d904b180-0ca6-11eb-9951-56c8200ee025.png)
 
+This component can be used as entity as well
+
+![image](https://user-images.githubusercontent.com/8268674/96303544-7be46500-0ff2-11eb-9a86-16af9c52f1d0.png)
 
 ## Configuration
 
@@ -14,7 +17,7 @@ The aim of this card is to show all the data provided by github integration. You
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | title | String |  | v0.1.0 | Card header/title text
-| entities | [Entity](#entity)[] | **(required)** | v0.1.0 | Collection of entities to display
+| entities | [Entity](#entity)[] \| String | **(required)** | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
 
 [+ Entity Properties](#Entity-Properties) - applied to all entities
 
@@ -52,6 +55,8 @@ E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
 ## Configuration examples
 
+### Card
+
 ```yaml
 type: 'custom:github-flexi-card'
 title: Github projects
@@ -84,6 +89,35 @@ entities:
       - name: open_issues
 ```
 
+### Entity
+
+Note: different type has to be used `custom:github-entity`
+
+![image](https://user-images.githubusercontent.com/8268674/96303544-7be46500-0ff2-11eb-9a86-16af9c52f1d0.png)
+
+```yaml
+type: entities
+title: Displayed as entity
+show_header_toggle: false
+entities:
+  - sensor.home_assistant_v2_db
+  - type: 'custom:github-entity'
+    entity: sensor.battery_state_card
+    secondary_info: 'Released {latest_release_tag}'
+    url: true
+    attribute_urls: true
+    attributes:
+      - name: views
+      - name: stargazers
+      - name: open_issues
+      - name: clones
+      - name: forks
+      - name: open_pull_requests
+  - sensor.hassio_online
+  - sensor.last_boot
+  - sensor.processor_use
+```
+
 ### Card-level entity properties
 
 Card-level entity properties are useful when you want to have same settings for all of the entities.
@@ -104,9 +138,9 @@ attributes:
   - name: forks
   - name: open_pull_requests
 entities:
-  - entity: sensor.battery_state_card
-  - entity: sensor.hideseek_mod
-  - entity: sensor.urleditorpro
+  - sensor.battery_state_card
+  - sensor.hideseek_mod
+  - sensor.urleditorpro
 ```
 
 ## How to install?

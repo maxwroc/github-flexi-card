@@ -9,7 +9,7 @@ interface IEntityProperties {
 
 export interface ICardConfig extends IEntityProperties {
     title: string,
-    entities: IEntityConfig[],
+    entities: (IEntityConfig | string)[],
 }
 
 export interface IEntityConfig extends IEntityProperties{

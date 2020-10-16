@@ -1,8 +1,8 @@
 import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
-import { ICardConfig } from "../types";
+import { ICardConfig, IEntityConfig } from "../types";
 import { GithubEntity } from "./entity";
-import styles from "./styles";
+import styles from "./card-styles";
 
 export class GithubFlexiCard extends LitElement {
 
@@ -32,26 +32,14 @@ export class GithubFlexiCard extends LitElement {
         this.cardTitle = cardConfig.title;
 
         if (this.entities.length != cardConfig.entities.length) {
-            this.entities = cardConfig.entities.map(entityConf => {
+            this.entities = cardConfig.entities.map(e => getEntityConfig(e, cardConfig)).map(entityConf => {
                 const elem = document.createElement("github-entity") as GithubEntity;
-
-                // we have to make a copy as the original one is immutable
-                const updatableConfig = { ...entityConf };
-
-                // if property is not defined take the card-level one
-                updatableConfig.attributes = updatableConfig.attributes || cardConfig.attributes;
-                updatableConfig.attribute_urls = updatableConfig.attribute_urls !== undefined ? updatableConfig.attribute_urls : cardConfig.attribute_urls;
-                updatableConfig.icon = updatableConfig.icon || cardConfig.icon;
-                updatableConfig.name = updatableConfig.name || cardConfig.name;
-                updatableConfig.secondary_info = updatableConfig.secondary_info || cardConfig.secondary_info;
-                updatableConfig.url = updatableConfig.url !== undefined ? updatableConfig.url : cardConfig.url;
-
-                elem.setConfig(updatableConfig);
+                elem.setConfig(entityConf);
                 return elem;
             })
         }
         else {
-            this.entities.forEach((entity, index) => entity.setConfig(cardConfig.entities[index]));
+            this.entities.forEach((entity, index) => entity.setConfig(getEntityConfig(cardConfig.entities[index], cardConfig)));
         }
     }
 
@@ -75,4 +63,26 @@ export class GithubFlexiCard extends LitElement {
         </div>
         `;
     }
+}
+
+/**
+ * Converts string entry to proper config obj and applies card-level settings
+ */
+const getEntityConfig = (configEntry: IEntityConfig | string, cardConfig: ICardConfig): IEntityConfig => {
+
+    const entityConfig = typeof configEntry != "string" ?
+        // we have to make a copy as the original one is immutable
+        { ...configEntry } :
+        // construct simple config entry
+        { entity: configEntry };
+
+    // if property is not defined take the card-level one
+    entityConfig.attributes = entityConfig.attributes || cardConfig.attributes;
+    entityConfig.attribute_urls = entityConfig.attribute_urls !== undefined ? entityConfig.attribute_urls : cardConfig.attribute_urls;
+    entityConfig.icon = entityConfig.icon || cardConfig.icon;
+    entityConfig.name = entityConfig.name || cardConfig.name;
+    entityConfig.secondary_info = entityConfig.secondary_info || cardConfig.secondary_info;
+    entityConfig.url = entityConfig.url !== undefined ? entityConfig.url : cardConfig.url;
+
+    return entityConfig;
 }

@@ -2,6 +2,122 @@ import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IAttribute } from "../types";
 import { logError } from "../utils";
+import styles from "./entity-styles";
+
+export class GithubEntity extends LitElement {
+
+    private config: IEntityConfig = <any>null;
+
+    private icon: string = "mdi:github";
+
+    private name: string = "";
+
+    private secondaryInfo: string = <any>null;
+
+    private attributesData: IAttributeViewData[] = [];
+
+    private action: Function | undefined;
+
+    private url: string | boolean | undefined;
+
+    /**
+     * CSS for the card
+     */
+    static get styles() {
+        return styles;
+    }
+
+    static get properties() {
+        return {
+            icon: { type: String },
+            name: { type: String },
+            secondaryInfo: { type: String },
+            attributesData: { type: Array },
+            action: { type: Function },
+        };
+    }
+
+    set hass(hass: HomeAssistant) {
+
+        if (!this.config) {
+            return;
+        }
+
+        const entityData = hass.states[this.config.entity];
+        if (!entityData) {
+            logError("Entity not found: " + this.config.entity);
+            return;
+        }
+
+        this.name = replaceKeywordsWithData(entityData.attributes, this.config.name) || entityData.attributes["friendly_name"];
+        this.icon = this.config.icon || entityData.attributes["icon"];
+
+        if (this.config.secondary_info) {
+            this.secondaryInfo = replaceKeywordsWithData(entityData.attributes, this.config.secondary_info) as string;
+        }
+
+        const newStats = getAttributesViewData(this.config, entityData.attributes);
+
+        // check to avoid unnecessary re-rendering
+        if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
+            this.attributesData = newStats;
+        }
+
+        // check whether we need to update the action
+        if (this.url != this.config.url) {
+            this.url = this.config.url;
+            this.action = getAction("home", this.url, entityData.attributes);
+        }
+    }
+
+    setConfig(config: IEntityConfig) {
+        const oldConfig = JSON.stringify(this.config);
+        const newConfig = JSON.stringify(config);
+
+        if (oldConfig == newConfig) {
+            return;
+        }
+
+        if (!config.entity) {
+            logError("Missing 'entity' property in entity configuration");
+            return;
+        }
+
+        // we cannot just assign the config because it is immutable and we want to change it
+        this.config = JSON.parse(newConfig);
+
+        this.name = config.name || config.entity;
+        config.icon && (this.icon = config.icon);
+        config.secondary_info && (this.secondaryInfo = config.secondary_info);
+    }
+
+    render() {
+        return html`
+        <div class="entity-row compact-view">
+            <div class="icon">
+                <ha-icon icon="${this.icon}"></ha-icon>
+            </div>
+            <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
+                ${this.name}
+                ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
+            </div>
+            ${this.attributesData.map(s => html`<div class="state${s.action ? " clickable" : ""}" @click="${s.action}"><ha-icon icon="${s.icon}" style="color: var(--primary-color)"></ha-icon><div>${s.value}</div></div>`)}
+        <div>
+        `;
+    }
+}
+
+interface IMap<T> {
+    [key: string]: T
+}
+
+interface IAttributeViewData {
+    value: string,
+    icon?: string,
+    label?: string,
+    action?: Function,
+}
+
 
 const replaceKeywordsWithData = (data: IMap<string>, text?: string) =>
     text && text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
@@ -86,113 +202,3 @@ const getAttributesViewData = (config: IEntityConfig, data: IMap<string>): IAttr
                 data),
         }
     });
-
-export class GithubEntity extends LitElement {
-
-    private config: IEntityConfig = <any>null;
-
-    private icon: string = "mdi:github";
-
-    private name: string = "";
-
-    private secondaryInfo: string = <any>null;
-
-    private attributesData: IAttributeViewData[] = [];
-
-    private action: Function | undefined;
-
-    private url: string | boolean | undefined;
-
-    static get properties() {
-        return {
-            icon: { type: String },
-            name: { type: String },
-            secondaryInfo: { type: String },
-            stats: { type: Array },
-            action: { type: Function },
-        };
-    }
-
-    set hass(hass: HomeAssistant) {
-
-        if (!this.config) {
-            return;
-        }
-
-        const entityData = hass.states[this.config.entity];
-        if (!entityData) {
-            logError("Entity not found: " + this.config.entity);
-            return;
-        }
-
-        this.name = replaceKeywordsWithData(entityData.attributes, this.config.name) || entityData.attributes["friendly_name"];
-        this.icon = this.config.icon || entityData.attributes["icon"];
-
-        if (this.config.secondary_info) {
-            this.secondaryInfo = replaceKeywordsWithData(entityData.attributes, this.config.secondary_info) as string;
-        }
-
-        const newStats = getAttributesViewData(this.config, entityData.attributes);
-        // check to avoid unnecessary re-rendering
-        if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
-            this.attributesData = newStats;
-        }
-
-        // check whether we need to update the action
-        if (this.url != this.config.url) {
-            this.url = this.config.url;
-            this.action = getAction("home", this.url, entityData.attributes);
-        }
-    }
-
-    setConfig(config: IEntityConfig) {
-        const oldConfig = JSON.stringify(this.config);
-        const newConfig = JSON.stringify(config);
-
-        if (oldConfig == newConfig) {
-            return;
-        }
-
-        if (!config.entity) {
-            logError("Missing 'entity' property in entity configuration");
-            return;
-        }
-
-        // we cannot just assign the config because it is immutable and we want to change it
-        this.config = JSON.parse(newConfig);
-
-        this.name = config.name || config.entity;
-        config.icon && (this.icon = config.icon);
-        config.secondary_info && (this.secondaryInfo = config.secondary_info);
-    }
-
-    createRenderRoot() {
-        return this;
-    }
-
-    render() {
-        return html`
-        <div class="entity-row compact-view">
-            <div class="icon">
-                <ha-icon icon="${this.icon}"></ha-icon>
-            </div>
-            <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
-                ${this.name}
-                ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
-            </div>
-            ${this.attributesData.map(s => html`<div class="state${s.action ? " clickable" : ""}" @click="${s.action}"><ha-icon icon="${s.icon}" style="color: var(--primary-color)"></ha-icon><div>${s.value}</div></div>`)}
-        <div>
-        `;
-    }
-}
-
-interface IMap<T> {
-    [key: string]: T
-}
-
-interface IAttributeViewData {
-    value: string,
-    icon?: string,
-    label?: string,
-    action?: Function,
-}
