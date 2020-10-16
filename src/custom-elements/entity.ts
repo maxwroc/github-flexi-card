@@ -39,6 +39,9 @@ export class GithubEntity extends LitElement {
         return styles;
     }
 
+    /**
+     * List of properties which trigger update when changed
+     */
     static get properties() {
         return {
             icon: { type: String },
@@ -49,6 +52,9 @@ export class GithubEntity extends LitElement {
         };
     }
 
+    /**
+     * Called whenever HS state is updated
+     */
     set hass(hass: HomeAssistant) {
 
         if (!this.config) {
@@ -82,6 +88,9 @@ export class GithubEntity extends LitElement {
         }
     }
 
+    /**
+     * Called whenever card config is updated
+     */
     setConfig(config: IEntityConfig) {
         const oldConfig = JSON.stringify(this.config);
         const newConfig = JSON.stringify(config);
@@ -103,6 +112,9 @@ export class GithubEntity extends LitElement {
         config.secondary_info && (this.secondaryInfo = config.secondary_info);
     }
 
+    /**
+     * Called when element rendering was triggered
+     */
     render() {
         return html`
         <div class="entity-row compact-view">
@@ -119,6 +131,9 @@ export class GithubEntity extends LitElement {
     }
 }
 
+/**
+ * View for single attribute
+ */
 const attributeView = (attr: IAttributeViewData) => html`
 <div class="state${attr.action ? " clickable" : ""}" @click="${attr.action}" title="${attr.tooltip}">
     <ha-icon icon="${attr.icon}" style="color: var(--primary-color)">
@@ -127,6 +142,9 @@ const attributeView = (attr: IAttributeViewData) => html`
 </div>
 `;
 
+/**
+ * Replaces keywords in given string with actual data
+ */
 const replaceKeywordsWithData = (data: IMap<string>, text?: string) =>
     text && text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
 
@@ -212,4 +230,7 @@ const getAttributesViewData = (config: IEntityConfig, data: IMap<string>): IAttr
         }
     });
 
+/**
+ * Converts attribute name to formatted tooltip text
+ */
 const attributeNameToTooltip = (name: string): string => name.substr(0, 1).toUpperCase() + name.substr(1).replace(/_/g, " ");
