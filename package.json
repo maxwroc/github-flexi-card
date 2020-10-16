@@ -1,6 +1,6 @@
 {
   "name": "github-flexi-card",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Home assistant github card",
   "main": "dist/github-flexi-card.js",
   "scripts": {

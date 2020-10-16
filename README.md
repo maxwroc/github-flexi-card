@@ -16,16 +16,24 @@ The aim of this card is to show all the data provided by github integration. You
 | title | String |  | v0.1.0 | Card header/title text
 | entities | [Entity](#entity)[] | **(required)** | v0.1.0 | Collection of entities to display
 
+[+ Entity Properties](#Entity-Properties) - applied to all entities
 
 ### Entity
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | entity | String | **(required)** | v0.1.0 | Entity ID e.g. `sensor.my_github_project`
+
+[+ Entity Properties](#Entity-Properties)
+
+### Entity Properties
+| Name | Type | Default | Since | Description |
+|:-----|:-----|:-----|:-----|:-----|
 | name | [KString](#keywordstring) |  | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
 | attributes | [Attribute](#attribute)[] |  | v0.1.0 | Attributes to display
 | url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
 | attribute_urls | Boolean |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
+| icon | String | `"mdi:github"` | v0.2.0 | Override for entity icon
 
 ### Attribute
 | Name | Type | Default | Since | Description |
@@ -42,7 +50,7 @@ E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
 ![image](https://user-images.githubusercontent.com/8268674/95771623-4ddde880-0cb3-11eb-9265-57876a08bd6e.png)
 
-## Configuration example
+## Configuration examples
 
 ```yaml
 type: 'custom:github-flexi-card'
@@ -74,6 +82,31 @@ entities:
       - name: views
       - name: stargazers
       - name: open_issues
+```
+
+### Card-level entity properties
+
+Card-level entity properties are useful when you want to have same settings for all of the entities.
+
+![image](https://user-images.githubusercontent.com/8268674/96266114-30b05f00-0fbe-11eb-9d10-f9b9e5dfc1cf.png)
+
+```yaml
+type: 'custom:github-flexi-card'
+title: Card-level entity properties
+secondary_info: 'Released {latest_release_tag}'
+url: true
+attribute_urls: true
+attributes:
+  - name: views
+  - name: stargazers
+  - name: open_issues
+  - name: clones
+  - name: forks
+  - name: open_pull_requests
+entities:
+  - entity: sensor.battery_state_card
+  - entity: sensor.hideseek_mod
+  - entity: sensor.urleditorpro
 ```
 
 ## How to install?
