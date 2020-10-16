@@ -2,6 +2,7 @@ import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IAttribute } from "../types";
 import { logError } from "../utils";
+import styles from "./entity-styles";
 
 export class GithubEntity extends LitElement {
 
@@ -18,6 +19,13 @@ export class GithubEntity extends LitElement {
     private action: Function | undefined;
 
     private url: string | boolean | undefined;
+
+    /**
+     * CSS for the card
+     */
+    static get styles() {
+        return styles;
+    }
 
     static get properties() {
         return {
@@ -81,10 +89,6 @@ export class GithubEntity extends LitElement {
         this.name = config.name || config.entity;
         config.icon && (this.icon = config.icon);
         config.secondary_info && (this.secondaryInfo = config.secondary_info);
-    }
-
-    createRenderRoot() {
-        return this;
     }
 
     render() {

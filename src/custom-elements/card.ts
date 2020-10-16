@@ -2,7 +2,7 @@ import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
 import { ICardConfig, IEntityConfig } from "../types";
 import { GithubEntity } from "./entity";
-import styles from "./styles";
+import styles from "./card-styles";
 
 export class GithubFlexiCard extends LitElement {
 

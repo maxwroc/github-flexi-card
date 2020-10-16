@@ -1,4 +1,4 @@
 /.vscode/
 /node_modules/
 /dist/
-/src/custom-elements/styles.ts
+/src/custom-elements/*-styles.ts
