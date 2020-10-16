@@ -14,7 +14,7 @@ The aim of this card is to show all the data provided by github integration. You
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | title | String |  | v0.1.0 | Card header/title text
-| entities | [Entity](#entity)[] | **(required)** | v0.1.0 | Collection of entities to display
+| entities | [Entity](#entity)[] \| String | **(required)** | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
 
 [+ Entity Properties](#Entity-Properties) - applied to all entities
 
@@ -104,9 +104,9 @@ attributes:
   - name: forks
   - name: open_pull_requests
 entities:
-  - entity: sensor.battery_state_card
-  - entity: sensor.hideseek_mod
-  - entity: sensor.urleditorpro
+  - sensor.battery_state_card
+  - sensor.hideseek_mod
+  - sensor.urleditorpro
 ```
 
 ## How to install?
