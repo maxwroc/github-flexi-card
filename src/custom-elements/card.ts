@@ -28,18 +28,30 @@ export class GithubFlexiCard extends LitElement {
         this.entities.forEach(entity => entity.hass = hass);
     }
 
-    setConfig(config: ICardConfig) {
-        this.cardTitle = config.title;
+    setConfig(cardConfig: ICardConfig) {
+        this.cardTitle = cardConfig.title;
 
-        if (this.entities.length != config.entities.length) {
-            this.entities = config.entities.map(entity => {
+        if (this.entities.length != cardConfig.entities.length) {
+            this.entities = cardConfig.entities.map(entityConf => {
                 const elem = document.createElement("github-entity") as GithubEntity;
-                elem.setConfig(entity);
+
+                // we have to make a copy as the original one is immutable
+                const updatableConfig = { ...entityConf };
+
+                // if property is not defined take the card-level one
+                updatableConfig.attributes = updatableConfig.attributes || cardConfig.attributes;
+                updatableConfig.attribute_urls = updatableConfig.attribute_urls !== undefined ? updatableConfig.attribute_urls : cardConfig.attribute_urls;
+                updatableConfig.icon = updatableConfig.icon || cardConfig.icon;
+                updatableConfig.name = updatableConfig.name || cardConfig.name;
+                updatableConfig.secondary_info = updatableConfig.secondary_info || cardConfig.secondary_info;
+                updatableConfig.url = updatableConfig.url !== undefined ? updatableConfig.url : cardConfig.url;
+
+                elem.setConfig(updatableConfig);
                 return elem;
             })
         }
         else {
-            this.entities.forEach((entity, index) => entity.setConfig(config.entities[index]));
+            this.entities.forEach((entity, index) => entity.setConfig(cardConfig.entities[index]));
         }
     }
 

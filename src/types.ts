@@ -1,16 +1,19 @@
-export interface ICardConfig {
-    title: string,
-    entities: IEntityConfig[]
-}
-
-export interface IEntityConfig {
-    entity_id: string,
+interface IEntityProperties {
     attributes?: IAttribute[],
     name?: string,
     secondary_info?: string,
     icon?: string,
     url?: string | boolean,
     attribute_urls?: boolean,
+}
+
+export interface ICardConfig extends IEntityProperties {
+    title: string,
+    entities: IEntityConfig[],
+}
+
+export interface IEntityConfig extends IEntityProperties{
+    entity: string,
 }
 
 export interface IAttribute {
