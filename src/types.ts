@@ -4,7 +4,7 @@ export interface ICardConfig {
 }
 
 export interface IEntityConfig {
-    entity_id: string,
+    entity: string,
     attributes?: IAttribute[],
     name?: string,
     secondary_info?: string,

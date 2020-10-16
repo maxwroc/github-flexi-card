@@ -20,7 +20,7 @@ The aim of this card is to show all the data provided by github integration. You
 ### Entity
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| entity_id | String | **(required)** | v0.1.0 | Entity ID e.g. `sensor.my_github_project`
+| entity | String | **(required)** | v0.1.0 | Entity ID e.g. `sensor.my_github_project`
 | name | [KString](#keywordstring) |  | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
 | attributes | [Attribute](#attribute)[] |  | v0.1.0 | Attributes to display
@@ -48,7 +48,7 @@ E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 type: 'custom:github-flexi-card'
 title: Github projects
 entities:
-  - entity_id: sensor.battery_state_card
+  - entity: sensor.battery_state_card
     secondary_info: 'Released {latest_release_tag}'
     url: "{latest_release_url}" # url taken from attribute
     attributes:
@@ -61,13 +61,13 @@ entities:
       - name: forks
       - name: open_pull_requests
         url: "{latest_open_pull_request_url}" # url taken from attribute
-  - entity_id: sensor.hideseek_mod
+  - entity: sensor.hideseek_mod
     url: true # default url - repo homepage
     attributes:
       - name: views
       - name: stargazers
       - name: forks
-  - entity_id: sensor.urleditorpro
+  - entity: sensor.urleditorpro
     name: 'Url Editor Pro (v{latest_release_tag})'
     secondary_info: 'Clones: {clones}'
     attributes:

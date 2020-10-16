@@ -115,14 +115,14 @@ export class GithubEntity extends LitElement {
 
     set hass(hass: HomeAssistant) {
 
-        if (!this.config.entity_id) {
+        if (!this.config.entity) {
             console.error("[github-flexi-card] Missing entity_id property in entity configuration");
             return;
         }
 
-        const entityData = hass.states[this.config.entity_id];
+        const entityData = hass.states[this.config.entity];
         if (!entityData) {
-            console.error("[github-flexi-card] Entity not found: " + this.config.entity_id);
+            console.error("[github-flexi-card] Entity not found: " + this.config.entity);
             return;
         }
 
@@ -157,7 +157,7 @@ export class GithubEntity extends LitElement {
         // we cannot just assign the config because it is immutable and we want to change it
         this.config = JSON.parse(newConfig);
 
-        this.name = config.name || config.entity_id;
+        this.name = config.name || config.entity;
         config.icon && (this.icon = config.icon);
         config.secondary_info && (this.secondaryInfo = config.secondary_info);
     }
