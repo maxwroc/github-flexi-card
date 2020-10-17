@@ -42,6 +42,8 @@ export class GithubFlexiCard extends LitElement {
     setConfig(cardConfig: ICardConfig) {
         this.cardTitle = cardConfig.title;
 
+        this.cardSize = 0;
+
         if (this.cardTitle) {
             this.cardSize++;
         }
