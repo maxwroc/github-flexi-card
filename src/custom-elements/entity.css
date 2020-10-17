@@ -1,9 +1,11 @@
-
-
 .truncate {
     white-space: nowrap;
     text-overflow: ellipsis;
     overflow: hidden;
+}
+
+.clickable {
+    cursor: pointer;
 }
 
 .entity-spacing:first-child {
@@ -62,8 +64,4 @@
 }
 .compact-view .state > * {
     margin: 0;
-}
-
-.clickable {
-    cursor: pointer;
 }

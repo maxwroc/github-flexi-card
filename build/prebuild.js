@@ -31,10 +31,19 @@ const minimizeCss =  content => {
 }
 
 const compileCss = async () => {
-    const cssFile = "src/custom-elements/styles.css";
-    const cssCode = await readFile(cssFile);
+    const dir = "src/custom-elements";
+    const files = fs.readdirSync(dir);
+    return Promise.all(files.map(async file => {
+        if (!file.endsWith(".css")) {
+            return;
+        }
 
-    return await writeFile(cssFile.replace(".css", ".ts"), 'import { css } from "../lit-element"; const styles = css`' + minimizeCss(cssCode) + '`; export default styles;');
+        const sourceFilePath = `${dir}/${file}`;
+        const targetFilePath = sourceFilePath.replace(".css", "-styles.ts");
+
+        const cssCode = await readFile(sourceFilePath);
+        await writeFile(targetFilePath, 'import { css } from "../lit-element"; const styles = css`' + minimizeCss(cssCode) + '`; export default styles;');
+    }));
 };
 
 // Updates version printed in console window

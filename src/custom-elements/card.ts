@@ -1,14 +1,16 @@
 import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
-import { ICardConfig } from "../types";
+import { ICardConfig, IEntityConfig } from "../types";
 import { GithubEntity } from "./entity";
-import styles from "./styles";
+import styles from "./card-styles";
 
 export class GithubFlexiCard extends LitElement {
 
     private cardTitle: string = "";
 
     private entities: GithubEntity[] = [];
+
+    private cardSize = 0;
 
     /**
      * CSS for the card
@@ -17,6 +19,9 @@ export class GithubFlexiCard extends LitElement {
         return styles;
     }
 
+    /**
+     * List of properties which trigger update when changed
+     */
     static get properties() {
         return {
             cardTitle: { type: String },
@@ -24,55 +29,92 @@ export class GithubFlexiCard extends LitElement {
         };
     }
 
+    /**
+     * Called whenever HS state is updated
+     */
     set hass(hass: HomeAssistant) {
         this.entities.forEach(entity => entity.hass = hass);
     }
 
+    /**
+     * Called whenever card config is updated
+     */
     setConfig(cardConfig: ICardConfig) {
         this.cardTitle = cardConfig.title;
 
+        this.cardSize = 0;
+
+        if (this.cardTitle) {
+            this.cardSize++;
+        }
+
         if (this.entities.length != cardConfig.entities.length) {
-            this.entities = cardConfig.entities.map(entityConf => {
+            this.entities = cardConfig.entities.map(e => getEntityConfig(e, cardConfig)).map(entityConf => {
                 const elem = document.createElement("github-entity") as GithubEntity;
-
-                // we have to make a copy as the original one is immutable
-                const updatableConfig = { ...entityConf };
-
-                // if property is not defined take the card-level one
-                updatableConfig.attributes = updatableConfig.attributes || cardConfig.attributes;
-                updatableConfig.attribute_urls = updatableConfig.attribute_urls !== undefined ? updatableConfig.attribute_urls : cardConfig.attribute_urls;
-                updatableConfig.icon = updatableConfig.icon || cardConfig.icon;
-                updatableConfig.name = updatableConfig.name || cardConfig.name;
-                updatableConfig.secondary_info = updatableConfig.secondary_info || cardConfig.secondary_info;
-                updatableConfig.url = updatableConfig.url !== undefined ? updatableConfig.url : cardConfig.url;
-
-                elem.setConfig(updatableConfig);
+                elem.setConfig(entityConf);
+                this.cardSize++;
                 return elem;
             })
         }
         else {
-            this.entities.forEach((entity, index) => entity.setConfig(cardConfig.entities[index]));
+            this.entities.forEach((entity, index) => entity.setConfig(getEntityConfig(cardConfig.entities[index], cardConfig)));
         }
     }
 
+    /**
+     * Gets the height of your card.
+     *
+     * Home Assistant uses this to automatically distribute all cards over
+     * the available columns. One is equal 50px.
+     */
+    getCardSize() {
+        return this.cardSize;
+    }
+
+    /**
+     * Called when element rendering was triggered
+     */
     render() {
         return html`
         <ha-card>
-            ${this.getHeader()}
+            ${this.cardTitle && header(this.cardTitle)}
             <div class="card-content">
                 ${this.entities}
             </div>
         </ha-card>
         `;
     }
+}
 
-    private getHeader() {
-        return this.cardTitle && html`
-        <div class="card-header">
-            <div class="truncate">
-                ${this.cardTitle}
-            </div>
-        </div>
-        `;
-    }
+/**
+ * Header/title view
+ */
+const header = (title: string) => html`
+<div class="card-header">
+    <div class="truncate">
+        ${title}
+    </div>
+</div>
+`;
+
+/**
+ * Converts string entry to proper config obj and applies card-level settings
+ */
+const getEntityConfig = (configEntry: IEntityConfig | string, cardConfig: ICardConfig): IEntityConfig => {
+
+    const entityConfig = typeof configEntry != "string" ?
+        // we have to make a copy as the original one is immutable
+        { ...configEntry } :
+        // construct simple config entry
+        { entity: configEntry };
+
+    // if property is not defined take the card-level one
+    entityConfig.attributes = entityConfig.attributes || cardConfig.attributes;
+    entityConfig.attribute_urls = entityConfig.attribute_urls !== undefined ? entityConfig.attribute_urls : cardConfig.attribute_urls;
+    entityConfig.icon = entityConfig.icon || cardConfig.icon;
+    entityConfig.name = entityConfig.name || cardConfig.name;
+    entityConfig.secondary_info = entityConfig.secondary_info || cardConfig.secondary_info;
+    entityConfig.url = entityConfig.url !== undefined ? entityConfig.url : cardConfig.url;
+
+    return entityConfig;
 }
