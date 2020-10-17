@@ -73,7 +73,6 @@ export class GithubFlexiCard extends LitElement {
      * Called when element rendering was triggered
      */
     render() {
-        console.log("render");
         return html`
         <ha-card>
             ${this.cardTitle && header(this.cardTitle)}
