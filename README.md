@@ -54,6 +54,12 @@ E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
 ![image](https://user-images.githubusercontent.com/8268674/95771623-4ddde880-0cb3-11eb-9265-57876a08bd6e.png)
 
+#### Converting keyword value
+
+You can do simple replace operation on the value e.g.: `"{name:Github=Project}"`. It will replace `"Github"` string in the `name` value with `"Project"`, so if your name attribute is `"Github github-flexi-card"` then the final result will be `"Project github-flexi-card"`.
+
+Note: It is very simple replace machanism, it is case sensitive, replaces only first match and it doesn't have any escape chars so you cannot use characters like `=` or `:` in the search word nor target word.
+
 ## Configuration examples
 
 ### Card
