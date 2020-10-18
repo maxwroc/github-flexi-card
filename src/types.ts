@@ -22,3 +22,7 @@ export interface IAttribute {
     label?: string,
     url?: string | boolean,
 }
+
+export interface IMap<T> {
+    [key: string]: T
+}

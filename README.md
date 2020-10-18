@@ -44,6 +44,7 @@ This component can be used as entity as well
 | name | String | **(required)** | v0.1.0 | Name of the attribute
 | icon | String |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
 | url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
+| label | [KString](#keywordstring) |  | v0.5.0 | Label/text which will be shown instead of the icon
 
 ### KeywordString
 
@@ -52,6 +53,12 @@ KeywordString is a string which can contain special keywords. Keywords are the a
 E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
 ![image](https://user-images.githubusercontent.com/8268674/95771623-4ddde880-0cb3-11eb-9265-57876a08bd6e.png)
+
+#### Converting keyword value
+
+You can do simple replace operation on the value e.g.: `"{name:Github=Project}"`. It will replace `"Github"` string in the `name` value with `"Project"`, so if your name attribute is `"Github github-flexi-card"` then the final result will be `"Project github-flexi-card"`.
+
+Note: It is very simple replace machanism, it is case sensitive, replaces only first match and it doesn't have any escape chars so you cannot use characters like `=` or `:` in the search word nor target word.
 
 ## Configuration examples
 
@@ -137,6 +144,28 @@ attributes:
   - name: clones
   - name: forks
   - name: open_pull_requests
+entities:
+  - sensor.battery_state_card
+  - sensor.hideseek_mod
+  - sensor.urleditorpro
+```
+
+### Labels instead of icons
+
+![image](https://user-images.githubusercontent.com/8268674/96354074-37c49380-10ca-11eb-9151-829e5c37f877.png)
+
+```yaml
+type: 'custom:github-flexi-card'
+title: Labels instead of icons
+url: true
+attribute_urls: true
+attributes:
+  - name: views
+    label: Views
+  - name: stargazers
+    label: Stars
+  - name: open_issues
+    label: Issues
 entities:
   - sensor.battery_state_card
   - sensor.hideseek_mod
