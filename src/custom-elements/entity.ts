@@ -1,12 +1,9 @@
 import { HomeAssistant } from "../ha-types";
+import { KeywordStringProcessor } from "../keyword-processor";
 import { html, LitElement } from "../lit-element";
-import { IEntityConfig, IAttribute } from "../types";
+import { IEntityConfig, IMap } from "../types";
 import { logError } from "../utils";
 import styles from "./entity-styles";
-
-interface IMap<T> {
-    [key: string]: T
-}
 
 interface IAttributeViewData {
     value: string,
@@ -67,11 +64,13 @@ export class GithubEntity extends LitElement {
             return;
         }
 
-        this.name = replaceKeywordsWithData(entityData.attributes, this.config.name) || entityData.attributes["friendly_name"];
+        const keywordProcessor = new KeywordStringProcessor(entityData.attributes);
+
+        this.name = keywordProcessor.process(this.config.name) || entityData.attributes["friendly_name"];
         this.icon = this.config.icon || entityData.attributes["icon"];
 
         if (this.config.secondary_info) {
-            this.secondaryInfo = replaceKeywordsWithData(entityData.attributes, this.config.secondary_info) as string;
+            this.secondaryInfo = keywordProcessor.process(this.config.secondary_info) as string;
         }
 
         const newStats = getAttributesViewData(this.config, entityData.attributes);
@@ -147,6 +146,8 @@ const attributeView = (attr: IAttributeViewData) => html`
  */
 const replaceKeywordsWithData = (data: IMap<string>, text?: string) =>
     text && text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
+
+
 
 /**
  * Attribute name to icon map
