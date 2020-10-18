@@ -136,8 +136,8 @@ export class GithubEntity extends LitElement {
  */
 const attributeView = (attr: IAttributeViewData) => html`
 <div class="state${attr.action ? " clickable" : ""}" @click="${attr.action}" title="${attr.tooltip}">
-    <ha-icon icon="${attr.icon}" style="color: var(--primary-color)">
-    </ha-icon>
+    ${attr.label && html`<div class="label">${attr.label}</div>`}
+    ${(attr.icon && !attr.label) ? html`<ha-icon icon="${attr.icon}" style="color: var(--primary-color)"></ha-icon>` : null}
     <div>${attr.value}</div>
 </div>
 `;

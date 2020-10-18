@@ -1,3 +1,7 @@
+:host {
+    --attribute-icon-size: 20px;
+}
+
 .truncate {
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -39,7 +43,7 @@
 }
 
 .state {
-    --mdc-icon-size: 20px;
+    --mdc-icon-size: var(--attribute-icon-size);
     display: flex;
     margin-left: 7px;
 }
@@ -62,6 +66,12 @@
 .compact-view .state > div {
     line-height: normal;
 }
+.compact-view .state > .label {
+    margin-top: 1px; /* fix for small misalignment if you have icon next to label */
+    color: var(--primary-color);
+    line-height: var(--attribute-icon-size);
+}
+
 .compact-view .state > * {
     margin: 0;
 }

@@ -44,6 +44,7 @@ This component can be used as entity as well
 | name | String | **(required)** | v0.1.0 | Name of the attribute
 | icon | String |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
 | url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
+| label | [KString](#keywordstring) |  | v0.5.0 | Label/text which will be shown instead of the icon
 
 ### KeywordString
 
@@ -137,6 +138,28 @@ attributes:
   - name: clones
   - name: forks
   - name: open_pull_requests
+entities:
+  - sensor.battery_state_card
+  - sensor.hideseek_mod
+  - sensor.urleditorpro
+```
+
+### Labels instead of icons
+
+![image](https://user-images.githubusercontent.com/8268674/96354074-37c49380-10ca-11eb-9151-829e5c37f877.png)
+
+```yaml
+type: 'custom:github-flexi-card'
+title: Labels instead of icons
+url: true
+attribute_urls: true
+attributes:
+  - name: views
+    label: Views
+  - name: stargazers
+    label: Stars
+  - name: open_issues
+    label: Issues
 entities:
   - sensor.battery_state_card
   - sensor.hideseek_mod
