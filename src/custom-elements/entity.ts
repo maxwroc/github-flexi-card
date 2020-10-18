@@ -64,7 +64,7 @@ export class GithubEntity extends LitElement {
             return;
         }
 
-        const keywordProcessor = new KeywordStringProcessor(entityData.attributes);
+        const keywordProcessor = new KeywordStringProcessor(entityData.attributes, entityData.state);
 
         this.name = keywordProcessor.process(this.config.name) || entityData.attributes["friendly_name"];
         this.icon = this.config.icon || entityData.attributes["icon"];

@@ -4,7 +4,10 @@ import { IMap } from "./types";
  * Class for processing keyword strings
  */
 export class KeywordStringProcessor {
-    constructor(private data: IMap<string>) {
+    constructor(private data: IMap<string>, state: string) {
+        if (!this.data["state"]) {
+            this.data["state"] = state;
+        }
     }
 
     /**
@@ -15,7 +18,7 @@ export class KeywordStringProcessor {
             return text;
         }
 
-        return text.replace(/\{([a-z0-9_=:]+)\}/g, (match, keyword) => this.replaceKeyword(keyword, match));
+        return text.replace(/\{([^\}]+)\}/g, (match, keyword) => this.replaceKeyword(keyword, match));
     }
 
     /**
