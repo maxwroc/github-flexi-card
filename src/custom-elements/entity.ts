@@ -73,7 +73,7 @@ export class GithubEntity extends LitElement {
             this.secondaryInfo = keywordProcessor.process(this.config.secondary_info) as string;
         }
 
-        const newStats = getAttributesViewData(this.config, entityData.attributes);
+        const newStats = getAttributesViewData(this.config, entityData.attributes, keywordProcessor);
 
         // check to avoid unnecessary re-rendering
         if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
@@ -83,7 +83,7 @@ export class GithubEntity extends LitElement {
         // check whether we need to update the action
         if (this.url != this.config.url) {
             this.url = this.config.url;
-            this.action = getAction("home", this.url, entityData.attributes);
+            this.action = getAction("home", this.url, entityData.attributes["path"], keywordProcessor);
         }
     }
 
@@ -142,14 +142,6 @@ const attributeView = (attr: IAttributeViewData) => html`
 `;
 
 /**
- * Replaces keywords in given string with actual data
- */
-const replaceKeywordsWithData = (data: IMap<string>, text?: string) =>
-    text && text.replace(/\{([a-z0-9_]+)\}/g, (match, keyword) => data[keyword] !== undefined ? data[keyword] : match);
-
-
-
-/**
  * Attribute name to icon map
  */
 const nameToIconMap: IMap<string> = {
@@ -183,14 +175,14 @@ const nameToUrlPathMap: IMap<string> = {
 /**
  * Creates action for clickable elements
  */
-const getAction = (attributeName: string, url: boolean | string | undefined, data: IMap<string>): Function | undefined => {
+const getAction = (attributeName: string, url: boolean | string | undefined, path: string, keywordProcessor: KeywordStringProcessor): Function | undefined => {
     switch (typeof url) {
         case "boolean":
             if (!url) {
                 return undefined;
             }
 
-            if (!data["path"]) {
+            if (!path) {
                 logError(`Cannot build url - entity path attribute is missing`);
                 return undefined;
             }
@@ -200,9 +192,9 @@ const getAction = (attributeName: string, url: boolean | string | undefined, dat
                 return undefined;
             }
 
-            return () => window.open(`https://github.com/${data["path"]}/${nameToUrlPathMap[attributeName]}`);
+            return () => window.open(`https://github.com/${path}/${nameToUrlPathMap[attributeName]}`);
         case "string":
-            return () => window.open(replaceKeywordsWithData(data, url));
+            return () => window.open(keywordProcessor.process(url));
         case "undefined":
             // we don't do anything
             break;
@@ -216,18 +208,20 @@ const getAction = (attributeName: string, url: boolean | string | undefined, dat
 /**
  * Gets list of attributes data to render
  */
-const getAttributesViewData = (config: IEntityConfig, data: IMap<string>): IAttributeViewData[] =>
+const getAttributesViewData = (config: IEntityConfig, data: IMap<string>, keywordProcessor: KeywordStringProcessor): IAttributeViewData[] =>
     (config.attributes || []).map(a => {
         return {
             value: data[a.name],
             tooltip: attributeNameToTooltip(a.name),
             icon: a.icon || nameToIconMap[a.name],
-            label: a.label && replaceKeywordsWithData(data, a.label),
+            label: a.label && keywordProcessor.process(a.label),
             action: getAction(
                 a.name,
                 // if attrib url property is missing use the entity-level setting
                 a.url !== undefined ? a.url : config.attribute_urls,
-                data),
+                data["path"],
+                keywordProcessor
+            ),
         }
     });
 
