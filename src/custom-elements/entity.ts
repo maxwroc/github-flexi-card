@@ -2,7 +2,7 @@ import { HomeAssistant } from "../ha-types";
 import { KeywordStringProcessor } from "../keyword-processor";
 import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IMap } from "../types";
-import { logError } from "../utils";
+import { getConfigValue, logError } from "../utils";
 import styles from "./entity-styles";
 
 interface IAttributeViewData {
@@ -29,6 +29,8 @@ export class GithubEntity extends LitElement {
 
     private url: string | boolean | undefined;
 
+    private compact_view: boolean = true;
+
     /**
      * CSS for the card
      */
@@ -46,6 +48,7 @@ export class GithubEntity extends LitElement {
             secondaryInfo: { type: String },
             attributesData: { type: Array },
             action: { type: Function },
+            compact_view: { type: Boolean },
         };
     }
 
@@ -109,6 +112,8 @@ export class GithubEntity extends LitElement {
         this.name = config.name || config.entity;
         config.icon && (this.icon = config.icon);
         config.secondary_info && (this.secondaryInfo = config.secondary_info);
+
+        this.compact_view = getConfigValue(<boolean>config.compact_view, true);
     }
 
     /**
@@ -116,7 +121,7 @@ export class GithubEntity extends LitElement {
      */
     render() {
         return html`
-        <div class="entity-row compact-view">
+        <div class="entity-row${this.compact_view ? " compact-view" : ""}">
             <div class="icon">
                 <ha-icon icon="${this.icon}"></ha-icon>
             </div>

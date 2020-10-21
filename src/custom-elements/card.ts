@@ -3,6 +3,7 @@ import { html, LitElement } from "../lit-element";
 import { ICardConfig, IEntityConfig } from "../types";
 import { GithubEntity } from "./entity";
 import styles from "./card-styles";
+import { getConfigValue } from "../utils";
 
 export class GithubFlexiCard extends LitElement {
 
@@ -97,8 +98,6 @@ const header = (title: string) => html`
 </div>
 `;
 
-const getConfigValue = <T>(value: T, defaultValue: T): T => value === undefined ? defaultValue : value;
-
 /**
  * Converts string entry to proper config obj and applies card-level settings
  */
@@ -117,6 +116,7 @@ const getEntityConfig = (configEntry: IEntityConfig | string, cardConfig: ICardC
     entityConfig.name = getConfigValue(entityConfig.name, cardConfig.name);
     entityConfig.secondary_info = getConfigValue(entityConfig.secondary_info, cardConfig.secondary_info);
     entityConfig.url = getConfigValue(entityConfig.url, cardConfig.url);
+    entityConfig.compact_view = getConfigValue(entityConfig.compact_view, cardConfig.compact_view, true);
 
     return entityConfig;
 }

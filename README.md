@@ -31,12 +31,13 @@ This component can be used as entity as well
 ### Entity Properties
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| name | [KString](#keywordstring) |  | v0.1.0 | Name override
+| name | [KString](#keywordstring) | `friendly_name` | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
 | attributes | [Attribute](#attribute)[] |  | v0.1.0 | Attributes to display
 | url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
 | attribute_urls | Boolean |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
 | icon | String | `"mdi:github"` | v0.2.0 | Override for entity icon
+| compact_view | Boolean | `true` | v1.0.0 |
 
 ### Attribute
 | Name | Type | Default | Since | Description |
@@ -169,6 +170,25 @@ attributes:
 entities:
   - sensor.battery_state_card
   - sensor.hideseek_mod
+  - sensor.urleditorpro
+```
+
+### Compact view (disabling)
+
+![image](https://user-images.githubusercontent.com/8268674/96794344-eda71f00-13f5-11eb-85f2-f60caad2fa63.png)
+
+```yaml
+type: 'custom:github-flexi-card'
+title: Big icons
+url: true
+attribute_urls: true
+attributes:
+  - name: views
+  - name: stargazers
+entities:
+  - sensor.battery_state_card
+  - entity: sensor.hideseek_mod
+    compact_view: false
   - sensor.urleditorpro
 ```
 

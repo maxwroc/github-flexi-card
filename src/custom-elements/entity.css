@@ -42,8 +42,11 @@
     margin-right: 10px;
 }
 
-.state {
+.compact-view .state {
     --mdc-icon-size: var(--attribute-icon-size);
+    font-size: var(--paper-font-caption_-_font-size);
+}
+.state {
     display: flex;
     margin-left: 7px;
 }
@@ -54,7 +57,6 @@
     margin-left: 0;
 }
 .state > div {
-    font-size: var(--paper-font-caption_-_font-size);
     line-height: 24px;
 }
 

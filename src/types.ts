@@ -5,6 +5,7 @@ interface IEntityProperties {
     icon?: string,
     url?: string | boolean,
     attribute_urls?: boolean,
+    compact_view?: boolean,
 }
 
 export interface ICardConfig extends IEntityProperties {
