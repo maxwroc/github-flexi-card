@@ -97,6 +97,8 @@ const header = (title: string) => html`
 </div>
 `;
 
+const getConfigValue = <T>(value: T, defaultValue: T): T => value === undefined ? defaultValue : value;
+
 /**
  * Converts string entry to proper config obj and applies card-level settings
  */
@@ -109,12 +111,12 @@ const getEntityConfig = (configEntry: IEntityConfig | string, cardConfig: ICardC
         { entity: configEntry };
 
     // if property is not defined take the card-level one
-    entityConfig.attributes = entityConfig.attributes || cardConfig.attributes;
-    entityConfig.attribute_urls = entityConfig.attribute_urls !== undefined ? entityConfig.attribute_urls : cardConfig.attribute_urls;
-    entityConfig.icon = entityConfig.icon || cardConfig.icon;
-    entityConfig.name = entityConfig.name || cardConfig.name;
-    entityConfig.secondary_info = entityConfig.secondary_info || cardConfig.secondary_info;
-    entityConfig.url = entityConfig.url !== undefined ? entityConfig.url : cardConfig.url;
+    entityConfig.attributes = getConfigValue(entityConfig.attributes, cardConfig.attributes);
+    entityConfig.attribute_urls = getConfigValue(entityConfig.attribute_urls, cardConfig.attribute_urls);
+    entityConfig.icon = getConfigValue(entityConfig.icon, cardConfig.icon);
+    entityConfig.name = getConfigValue(entityConfig.name, cardConfig.name);
+    entityConfig.secondary_info = getConfigValue(entityConfig.secondary_info, cardConfig.secondary_info);
+    entityConfig.url = getConfigValue(entityConfig.url, cardConfig.url);
 
     return entityConfig;
 }
