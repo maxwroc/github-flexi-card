@@ -1,6 +1,6 @@
 import { HomeAssistant } from "../ha-types";
 import { html, LitElement } from "../lit-element";
-import { ICardConfig, IEntityConfig } from "../types";
+import { ICardConfig, IEntityConfig, ISortOptions } from "../types";
 import { GithubEntity } from "./entity";
 import styles from "./card-styles";
 import { getConfigValue } from "../utils";
@@ -12,6 +12,10 @@ export class GithubFlexiCard extends LitElement {
     private entities: GithubEntity[] = [];
 
     private cardSize = 0;
+
+    private sortOptions?: ISortOptions[];
+
+    private order: number[] = [];
 
     /**
      * CSS for the card
@@ -27,6 +31,7 @@ export class GithubFlexiCard extends LitElement {
         return {
             cardTitle: { type: String },
             entities: { type: Array },
+            order: { type: Array },
         };
     }
 
@@ -35,6 +40,28 @@ export class GithubFlexiCard extends LitElement {
      */
     set hass(hass: HomeAssistant) {
         this.entities.forEach(entity => entity.hass = hass);
+
+        if (this.sortOptions) {
+            const attrNames = this.sortOptions.map(s => s.by);
+            const values = this.entities.map(e => e.getEntityAttributeValues(attrNames));
+
+            const applySortType = (a: number, b: number, ascending?: boolean) => ascending ? a - b : b - a;
+
+            // default order matches the config
+            const defaultOrder = this.entities.map((e, i) => i);
+            const newOrder = defaultOrder.sort(
+                (a, b) => values[a].reduce(
+                    (prev, curr, i) => prev != 0 ? prev : applySortType(curr, values[b][i], this.sortOptions![i].ascending),
+                    0
+                )
+            );
+
+            // check if order has changed
+            if (this.order.some((v, i) => v != newOrder[i])) {
+                // trigger update
+                this.order = newOrder;
+            }
+        }
     }
 
     /**
@@ -55,11 +82,15 @@ export class GithubFlexiCard extends LitElement {
                 elem.setConfig(entityConf);
                 this.cardSize++;
                 return elem;
-            })
+            });
         }
         else {
             this.entities.forEach((entity, index) => entity.setConfig(getEntityConfig(cardConfig.entities[index], cardConfig)));
         }
+
+        this.order = this.entities.map((e, i) => i);
+
+        this.sortOptions = cardConfig.sort;
     }
 
     /**
@@ -80,7 +111,7 @@ export class GithubFlexiCard extends LitElement {
         <ha-card>
             ${this.cardTitle && header(this.cardTitle)}
             <div class="card-content">
-                ${this.entities}
+                ${this.order.map(i => this.entities[i])}
             </div>
         </ha-card>
         `;

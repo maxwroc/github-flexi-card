@@ -1,4 +1,4 @@
-import { HomeAssistant } from "../ha-types";
+import { HassEntity, HomeAssistant } from "../ha-types";
 import { KeywordStringProcessor } from "../keyword-processor";
 import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IMap } from "../types";
@@ -31,6 +31,10 @@ export class GithubEntity extends LitElement {
 
     private compact_view: boolean = true;
 
+    private entityData: HassEntity = <any>null;
+
+    public attributesUpdated: boolean = false;
+
     /**
      * CSS for the card
      */
@@ -61,32 +65,35 @@ export class GithubEntity extends LitElement {
             return;
         }
 
-        const entityData = hass.states[this.config.entity];
-        if (!entityData) {
+        this.attributesUpdated = false;
+
+        this.entityData = hass.states[this.config.entity];
+        if (!this.entityData) {
             logError("Entity not found: " + this.config.entity);
             return;
         }
 
-        const keywordProcessor = new KeywordStringProcessor(entityData.attributes, entityData.state);
+        const keywordProcessor = new KeywordStringProcessor(this.entityData.attributes, this.entityData.state);
 
-        this.name = keywordProcessor.process(this.config.name) || entityData.attributes["friendly_name"];
-        this.icon = this.config.icon || entityData.attributes["icon"];
+        this.name = keywordProcessor.process(this.config.name) || this.entityData.attributes["friendly_name"];
+        this.icon = this.config.icon || this.entityData.attributes["icon"];
 
         if (this.config.secondary_info) {
             this.secondaryInfo = keywordProcessor.process(this.config.secondary_info) as string;
         }
 
-        const newStats = getAttributesViewData(this.config, entityData.attributes, keywordProcessor);
+        const newStats = getAttributesViewData(this.config, this.entityData.attributes, keywordProcessor);
 
         // check to avoid unnecessary re-rendering
         if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
             this.attributesData = newStats;
+            this.attributesUpdated = true;
         }
 
         // check whether we need to update the action
         if (this.url != this.config.url) {
             this.url = this.config.url;
-            this.action = getAction("home", this.url, entityData.attributes["path"], keywordProcessor);
+            this.action = getAction("home", this.url, this.entityData.attributes["path"], keywordProcessor);
         }
     }
 
@@ -132,6 +139,10 @@ export class GithubEntity extends LitElement {
             ${this.attributesData.map(attributeView)}
         <div>
         `;
+    }
+
+    getEntityAttributeValues(names: string[]): number[] {
+        return names.map(n => this.entityData?.attributes[n] || 0);
     }
 }
 

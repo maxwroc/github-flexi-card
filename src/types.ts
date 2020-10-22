@@ -11,6 +11,7 @@ interface IEntityProperties {
 export interface ICardConfig extends IEntityProperties {
     title: string,
     entities: (IEntityConfig | string)[],
+    sort?: ISortOptions[],
 }
 
 export interface IEntityConfig extends IEntityProperties{
@@ -26,4 +27,9 @@ export interface IAttribute {
 
 export interface IMap<T> {
     [key: string]: T
+}
+
+export interface ISortOptions {
+    by: string,
+    ascending?: boolean,
 }
