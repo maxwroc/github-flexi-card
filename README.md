@@ -17,7 +17,8 @@ This component can be used as entity as well
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | title | String |  | v0.1.0 | Card header/title text
-| entities | [Entity](#entity)[] \| String | **(required)** | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
+| entities | list([Entity](#entity)) \| String | **(required)** | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
+| sort | list([SortOptions](#sort-options)) |  | v1.0.0 | Sort options collection (order matters). Every next sorting option is used fot the next level sorting (if the values of the previous one are same)
 
 [+ Entity Properties](#Entity-Properties) - applied to all entities
 
@@ -33,7 +34,7 @@ This component can be used as entity as well
 |:-----|:-----|:-----|:-----|:-----|
 | name | [KString](#keywordstring) | `friendly_name` | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
-| attributes | [Attribute](#attribute)[] |  | v0.1.0 | Attributes to display
+| attributes | list([Attribute](#attribute)) |  | v0.1.0 | Attributes to display
 | url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
 | attribute_urls | Boolean |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
 | icon | String | `"mdi:github"` | v0.2.0 | Override for entity icon
@@ -46,6 +47,14 @@ This component can be used as entity as well
 | icon | String |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
 | url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
 | label | [KString](#keywordstring) |  | v0.5.0 | Label/text which will be shown instead of the icon
+
+### Sort options
+
+| Name | Type | Default | Since | Description |
+|:-----|:-----|:-----|:-----|:-----|
+| by | String | **(required)** | v1.0.0 | Name of the attribute
+| ascending | Boolean | `false` | v1.0.0 | Whether to sort ascending or descending
+
 
 ### KeywordString
 
@@ -190,6 +199,34 @@ entities:
   - entity: sensor.hideseek_mod
     compact_view: false
   - sensor.urleditorpro
+```
+
+### Sorting
+
+![image](https://user-images.githubusercontent.com/8268674/96928429-72ef0a00-14b0-11eb-95dd-4f1c76e217ec.png)
+
+```yaml
+type: 'custom:github-flexi-card'
+title: Sort by starts and views (asc)
+secondary_info: '{latest_release_tag}'
+url: true
+attribute_urls: true
+attributes:
+  - name: views_unique
+  - name: stargazers
+  - name: open_issues
+  - name: open_pull_requests
+sort:
+  - by: stargazers
+  - by: views_unique
+    ascending: true
+entities:
+  - sensor.battery_state_card
+  - sensor.hideseek_mod
+  - sensor.github_flexi_card
+  - sensor.urleditorpro
+  - entity: sensor.home_assistant_config
+    secondary_info: null
 ```
 
 ## How to install?
