@@ -240,3 +240,7 @@ resources:
   - url: /hacsfiles/github-flexi-card/github-flexi-card.js
     type: module
 ```
+
+## Do you like the card?
+
+Don't "buy me a coffee", just star it on github! It will be enough to let me know that you like it and definitely will give me motivation boost to continue working on it and other cards.
