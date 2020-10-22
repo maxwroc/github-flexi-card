@@ -3,7 +3,7 @@ import { html, LitElement } from "../lit-element";
 import { ICardConfig, IEntityConfig, ISortOptions } from "../types";
 import { GithubEntity } from "./entity";
 import styles from "./card-styles";
-import { getConfigValue } from "../utils";
+import { getConfigValue, safeGetArray, safeGetConfigObject } from "../utils";
 
 export class GithubFlexiCard extends LitElement {
 
@@ -41,7 +41,7 @@ export class GithubFlexiCard extends LitElement {
     set hass(hass: HomeAssistant) {
         this.entities.forEach(entity => entity.hass = hass);
 
-        if (this.sortOptions) {
+        if (this.sortOptions && this.sortOptions.length) {
             const attrNames = this.sortOptions.map(s => s.by);
             const values = this.entities.map(e => e.getEntityAttributeValues(attrNames));
 
@@ -90,7 +90,8 @@ export class GithubFlexiCard extends LitElement {
 
         this.order = this.entities.map((e, i) => i);
 
-        this.sortOptions = cardConfig.sort;
+        const sortOptions = safeGetArray(cardConfig.sort).map(s => safeGetConfigObject(s, "by"))
+        this.sortOptions = sortOptions;
     }
 
     /**
@@ -134,11 +135,7 @@ const header = (title: string) => html`
  */
 const getEntityConfig = (configEntry: IEntityConfig | string, cardConfig: ICardConfig): IEntityConfig => {
 
-    const entityConfig = typeof configEntry != "string" ?
-        // we have to make a copy as the original one is immutable
-        { ...configEntry } :
-        // construct simple config entry
-        { entity: configEntry };
+    const entityConfig = safeGetConfigObject(configEntry, "entity");
 
     // if property is not defined take the card-level one
     entityConfig.attributes = getConfigValue(entityConfig.attributes, cardConfig.attributes);
