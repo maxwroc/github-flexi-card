@@ -1,9 +1,18 @@
 # Github Flexi Card
-Home Assistant card displaying data from [Github integration](https://www.home-assistant.io/integrations/github/)
+[![GitHub Release][releases-shield]][releases]
+[![GitHub All Releases][downloads-total-shield]][releases]
+<!--[![hacs_badge][hacs-shield]][hacs]
+[![Community Forum][forum-shield]][forum]-->
+
+Home Assistant card displaying data from [Github integration][ha-gh-integration]
 
 ## Overview
 
 The aim of this card is to show all the data provided by github integration. You can specify what kind of data is shown and where. Entity rows are matching the size of other standard entity rows from other native cards (e.g. height of the row, icon/text margins, font sizes, etc).
+
+This code works as both: card and enrity-row
+
+Note: If you plan to use it only as entity row you can consider using the other simpler/smaller code written by benct: [github-entity-row][github-entity-row]
 
 ![image](https://user-images.githubusercontent.com/8268674/97019224-fad42300-1547-11eb-8153-46c401f50455.png)
 
@@ -240,3 +249,14 @@ resources:
 ## Do you like the card?
 
 Don't "buy me a coffee", just star it on github! It will be enough to let me know that you like it and definitely will give me motivation boost to continue working on it and other cards.
+
+
+[releases]: https://github.com/maxwroc/github-flexi-card/releases
+[releases-shield]: https://img.shields.io/github/release/maxwroc/github-flexi-card.svg?style=popout
+[downloads-total-shield]: https://img.shields.io/github/downloads/maxwroc/github-flexi-card/total
+[forum]: https://community.home-assistant.io/t/lovelace-battery-state-card/191535
+[forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=popout
+[hacs-shield]: https://img.shields.io/badge/HACS-Default-orange.svg
+[hacs]: https://hacs.xyz/docs/default_repositories
+[ha-gh-integration]: https://www.home-assistant.io/integrations/github/
+[github-entity-row]: https://github.com/benct/lovelace-github-entity-row
