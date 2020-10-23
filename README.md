@@ -5,7 +5,7 @@ Home Assistant card displaying data from [Github integration](https://www.home-a
 
 The aim of this card is to show all the data provided by github integration. You can specify what kind of data is shown and where. Entity rows are matching the size of other standard entity rows from other native cards (e.g. height of the row, icon/text margins, font sizes, etc).
 
-![image](https://user-images.githubusercontent.com/8268674/97010559-78466600-153d-11eb-8eee-1a263db298eb.png)
+![image](https://user-images.githubusercontent.com/8268674/97018821-800b0800-1547-11eb-9a38-376703b3c5a5.png)
 
 
 
