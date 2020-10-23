@@ -68,6 +68,62 @@ export class GithubEntity extends LitElement {
         this.attributesUpdated = false;
 
         this.entityData = hass.states[this.config.entity];
+
+        this.processHassUpdate();
+    }
+
+    /**
+     * Called whenever card config is updated
+     */
+    setConfig(config: IEntityConfig) {
+        const oldConfig = JSON.stringify(this.config);
+        const newConfig = JSON.stringify(config);
+
+        if (oldConfig == newConfig) {
+            return;
+        }
+
+        if (!config.entity) {
+            logError("Missing 'entity' property in entity configuration");
+            return;
+        }
+
+        // we cannot just assign the config because it is immutable and we want to change it
+        this.config = JSON.parse(newConfig);
+
+        this.name = config.name || config.entity;
+        config.icon && (this.icon = config.icon);
+        config.secondary_info && (this.secondaryInfo = config.secondary_info);
+
+        this.compact_view = getConfigValue(<boolean>config.compact_view, true);
+
+        // we want the dynamic data (e.g. in keyword-strings) to be populated right away
+        this.entityData && this.processHassUpdate();
+    }
+
+    /**
+     * Called when element rendering was triggered
+     */
+    render() {
+        return html`
+        <div class="entity-row${this.compact_view ? " compact-view" : ""}">
+            <div class="icon">
+                <ha-icon icon="${this.icon}"></ha-icon>
+            </div>
+            <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
+                ${this.name}
+                ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
+            </div>
+            ${this.attributesData.map(attributeView)}
+        <div>
+        `;
+    }
+
+    getEntityAttributeValues(names: string[]): number[] {
+        return names.map(n => this.entityData?.attributes[n] || 0);
+    }
+
+    private processHassUpdate() {
         if (!this.entityData) {
             logError("Entity not found: " + this.config.entity);
             return;
@@ -95,54 +151,6 @@ export class GithubEntity extends LitElement {
             this.url = this.config.url;
             this.action = getAction("home", this.url, this.entityData.attributes["path"], keywordProcessor);
         }
-    }
-
-    /**
-     * Called whenever card config is updated
-     */
-    setConfig(config: IEntityConfig) {
-        const oldConfig = JSON.stringify(this.config);
-        const newConfig = JSON.stringify(config);
-
-        if (oldConfig == newConfig) {
-            return;
-        }
-
-        if (!config.entity) {
-            logError("Missing 'entity' property in entity configuration");
-            return;
-        }
-
-        // we cannot just assign the config because it is immutable and we want to change it
-        this.config = JSON.parse(newConfig);
-
-        this.name = config.name || config.entity;
-        config.icon && (this.icon = config.icon);
-        config.secondary_info && (this.secondaryInfo = config.secondary_info);
-
-        this.compact_view = getConfigValue(<boolean>config.compact_view, true);
-    }
-
-    /**
-     * Called when element rendering was triggered
-     */
-    render() {
-        return html`
-        <div class="entity-row${this.compact_view ? " compact-view" : ""}">
-            <div class="icon">
-                <ha-icon icon="${this.icon}"></ha-icon>
-            </div>
-            <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
-                ${this.name}
-                ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
-            </div>
-            ${this.attributesData.map(attributeView)}
-        <div>
-        `;
-    }
-
-    getEntityAttributeValues(names: string[]): number[] {
-        return names.map(n => this.entityData?.attributes[n] || 0);
     }
 }
 
