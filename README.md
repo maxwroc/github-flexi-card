@@ -5,19 +5,17 @@ Home Assistant card displaying data from [Github integration](https://www.home-a
 
 The aim of this card is to show all the data provided by github integration. You can specify what kind of data is shown and where. Entity rows are matching the size of other standard entity rows from other native cards (e.g. height of the row, icon/text margins, font sizes, etc).
 
-![image](https://user-images.githubusercontent.com/8268674/95763370-d904b180-0ca6-11eb-9951-56c8200ee025.png)
+![image](https://user-images.githubusercontent.com/8268674/97010559-78466600-153d-11eb-8eee-1a263db298eb.png)
 
-This component can be used as entity as well
 
-![image](https://user-images.githubusercontent.com/8268674/96303544-7be46500-0ff2-11eb-9a86-16af9c52f1d0.png)
 
 ## Configuration
 
 ### Card
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| title | String |  | v0.1.0 | Card header/title text
-| entities | list([Entity](#entity)) \| String | **(required)** | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
+| title | string |  | v0.1.0 | Card header/title text
+| entities | list([Entity](#entity)) \| string | **(required)** | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
 | sort | list([SortOptions](#sort-options)) |  | v1.0.0 | Sort options collection (order matters). Every next sorting option is used fot the next level sorting (if the values of the previous one are same)
 
 [+ Entity Properties](#Entity-Properties) - applied to all entities
@@ -25,7 +23,7 @@ This component can be used as entity as well
 ### Entity
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| entity | String | **(required)** | v0.1.0 | Entity ID e.g. `sensor.my_github_project`
+| entity | string | **(required)** | v0.1.0 | Entity ID e.g. `sensor.my_github_project`
 
 [+ Entity Properties](#Entity-Properties)
 
@@ -35,25 +33,25 @@ This component can be used as entity as well
 | name | [KString](#keywordstring) | `friendly_name` | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
 | attributes | list([Attribute](#attribute)) |  | v0.1.0 | Attributes to display
-| url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
-| attribute_urls | Boolean |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
-| icon | String | `"mdi:github"` | v0.2.0 | Override for entity icon
-| compact_view | Boolean | `true` | v1.0.0 |
+| url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
+| attribute_urls | bool |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
+| icon | string | `"mdi:github"` | v0.2.0 | Override for entity icon
+| compact_view | bool | `true` | v1.0.0 | When set to `false` big icons (and values) are displayed
 
 ### Attribute
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| name | String | **(required)** | v0.1.0 | Name of the attribute
-| icon | String |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
-| url | [KString](#keywordstring) \| Boolean |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
+| name | string | **(required)** | v0.1.0 | Name of the attribute
+| icon | string |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
+| url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
 | label | [KString](#keywordstring) |  | v0.5.0 | Label/text which will be shown instead of the icon
 
 ### Sort options
 
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| by | String | **(required)** | v1.0.0 | Name of the attribute
-| ascending | Boolean | `false` | v1.0.0 | Whether to sort ascending or descending
+| by | string | **(required)** | v1.0.0 | Name of the attribute
+| ascending | bool | `false` | v1.0.0 | Whether to sort ascending or descending
 
 
 ### KeywordString
