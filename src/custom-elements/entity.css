@@ -22,7 +22,6 @@
 .entity-row {
     display: flex;
     align-items: center;
-    margin: 8px 0;
 }
 .entity-row .name {
     flex: 1;

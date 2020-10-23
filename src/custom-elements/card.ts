@@ -112,7 +112,7 @@ export class GithubFlexiCard extends LitElement {
         <ha-card>
             ${this.cardTitle && header(this.cardTitle)}
             <div class="card-content">
-                ${this.order.map(i => this.entities[i])}
+                ${this.order.map(i => html`<div>${this.entities[i]}</div>`)}
             </div>
         </ha-card>
         `;
