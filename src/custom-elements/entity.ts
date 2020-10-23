@@ -2,7 +2,7 @@ import { HassEntity, HomeAssistant } from "../ha-types";
 import { KeywordStringProcessor } from "../keyword-processor";
 import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IMap } from "../types";
-import { getConfigValue, logError } from "../utils";
+import { getConfigValue, logError, safeGetArray, safeGetConfigObject } from "../utils";
 import styles from "./entity-styles";
 
 interface IAttributeViewData {
@@ -233,7 +233,9 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
  * Gets list of attributes data to render
  */
 const getAttributesViewData = (config: IEntityConfig, data: IMap<string>, keywordProcessor: KeywordStringProcessor): IAttributeViewData[] =>
-    (config.attributes || []).map(a => {
+    safeGetArray(config.attributes).map(a => {
+        // it can come as string so making sure it's an object
+        a = safeGetConfigObject(a, "name");
         return {
             value: data[a.name],
             tooltip: attributeNameToTooltip(a.name),

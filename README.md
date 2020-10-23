@@ -90,16 +90,16 @@ entities:
   - entity: sensor.hideseek_mod
     url: true # default url - repo homepage
     attributes:
-      - name: views
-      - name: stargazers
-      - name: forks
+      - views
+      - stargazers
+      - forks
   - entity: sensor.urleditorpro
     name: 'Url Editor Pro (v{latest_release_tag})'
     secondary_info: 'Clones: {clones}'
     attributes:
-      - name: views
-      - name: stargazers
-      - name: open_issues
+      - views
+      - stargazers
+      - open_issues
 ```
 
 ### Entity
@@ -120,12 +120,12 @@ entities:
     url: true
     attribute_urls: true
     attributes:
-      - name: views
-      - name: stargazers
-      - name: open_issues
-      - name: clones
-      - name: forks
-      - name: open_pull_requests
+      - views
+      - stargazers
+      - open_issues
+      - clones
+      - forks
+      - open_pull_requests
   - sensor.hassio_online
   - sensor.last_boot
   - sensor.processor_use
@@ -144,12 +144,12 @@ secondary_info: 'Released {latest_release_tag}'
 url: true
 attribute_urls: true
 attributes:
-  - name: views
-  - name: stargazers
-  - name: open_issues
-  - name: clones
-  - name: forks
-  - name: open_pull_requests
+  - views
+  - stargazers
+  - open_issues
+  - clones
+  - forks
+  - open_pull_requests
 entities:
   - sensor.battery_state_card
   - sensor.hideseek_mod
@@ -188,8 +188,8 @@ title: Big icons
 url: true
 attribute_urls: true
 attributes:
-  - name: views
-  - name: stargazers
+  - views
+  - stargazers
 entities:
   - sensor.battery_state_card
   - entity: sensor.hideseek_mod
@@ -208,10 +208,10 @@ secondary_info: '{latest_release_tag}'
 url: true
 attribute_urls: true
 attributes:
-  - name: views_unique
-  - name: stargazers
-  - name: open_issues
-  - name: open_pull_requests
+  - views_unique
+  - stargazers
+  - open_issues
+  - open_pull_requests
 sort:
   - by: stargazers
   - by: views_unique

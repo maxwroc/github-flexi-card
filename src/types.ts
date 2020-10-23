@@ -1,5 +1,5 @@
 interface IEntityProperties {
-    attributes?: IAttribute[],
+    attributes?: (IAttribute | string)[],
     name?: string,
     secondary_info?: string,
     icon?: string,
