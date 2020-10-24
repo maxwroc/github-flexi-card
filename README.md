@@ -1,8 +1,8 @@
 # Github Flexi Card
 [![GitHub Release][releases-shield]][releases]
 [![GitHub All Releases][downloads-total-shield]][releases]
-<!--[![hacs_badge][hacs-shield]][hacs]
-[![Community Forum][forum-shield]][forum]-->
+[![Community Forum][forum-shield]][community-forum]
+<!--[![hacs_badge][hacs-shield]][hacs]-->
 
 Home Assistant card displaying data from [Github integration][ha-gh-integration]
 
@@ -254,7 +254,7 @@ Don't "buy me a coffee", just star it on github! It will be enough to let me kno
 [releases]: https://github.com/maxwroc/github-flexi-card/releases
 [releases-shield]: https://img.shields.io/github/release/maxwroc/github-flexi-card.svg?style=popout
 [downloads-total-shield]: https://img.shields.io/github/downloads/maxwroc/github-flexi-card/total
-[forum]: https://community.home-assistant.io/t/lovelace-battery-state-card/191535
+[community-forum]: https://community.home-assistant.io/t/lovelace-github-flexi-card/238635
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=popout
 [hacs-shield]: https://img.shields.io/badge/HACS-Default-orange.svg
 [hacs]: https://hacs.xyz/docs/default_repositories
