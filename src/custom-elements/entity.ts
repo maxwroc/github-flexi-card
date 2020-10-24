@@ -1,8 +1,8 @@
-import { HomeAssistant } from "../ha-types";
+import { HassEntity, HomeAssistant } from "../ha-types";
 import { KeywordStringProcessor } from "../keyword-processor";
 import { html, LitElement } from "../lit-element";
 import { IEntityConfig, IMap } from "../types";
-import { logError } from "../utils";
+import { getConfigValue, logError, safeGetArray, safeGetConfigObject } from "../utils";
 import styles from "./entity-styles";
 
 interface IAttributeViewData {
@@ -29,6 +29,12 @@ export class GithubEntity extends LitElement {
 
     private url: string | boolean | undefined;
 
+    private compact_view: boolean = true;
+
+    private entityData: HassEntity = <any>null;
+
+    public attributesUpdated: boolean = false;
+
     /**
      * CSS for the card
      */
@@ -46,6 +52,7 @@ export class GithubEntity extends LitElement {
             secondaryInfo: { type: String },
             attributesData: { type: Array },
             action: { type: Function },
+            compact_view: { type: Boolean },
         };
     }
 
@@ -58,33 +65,11 @@ export class GithubEntity extends LitElement {
             return;
         }
 
-        const entityData = hass.states[this.config.entity];
-        if (!entityData) {
-            logError("Entity not found: " + this.config.entity);
-            return;
-        }
+        this.attributesUpdated = false;
 
-        const keywordProcessor = new KeywordStringProcessor(entityData.attributes, entityData.state);
+        this.entityData = hass.states[this.config.entity];
 
-        this.name = keywordProcessor.process(this.config.name) || entityData.attributes["friendly_name"];
-        this.icon = this.config.icon || entityData.attributes["icon"];
-
-        if (this.config.secondary_info) {
-            this.secondaryInfo = keywordProcessor.process(this.config.secondary_info) as string;
-        }
-
-        const newStats = getAttributesViewData(this.config, entityData.attributes, keywordProcessor);
-
-        // check to avoid unnecessary re-rendering
-        if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
-            this.attributesData = newStats;
-        }
-
-        // check whether we need to update the action
-        if (this.url != this.config.url) {
-            this.url = this.config.url;
-            this.action = getAction("home", this.url, entityData.attributes["path"], keywordProcessor);
-        }
+        this.processHassUpdate();
     }
 
     /**
@@ -109,6 +94,11 @@ export class GithubEntity extends LitElement {
         this.name = config.name || config.entity;
         config.icon && (this.icon = config.icon);
         config.secondary_info && (this.secondaryInfo = config.secondary_info);
+
+        this.compact_view = getConfigValue(<boolean>config.compact_view, true);
+
+        // we want the dynamic data (e.g. in keyword-strings) to be populated right away
+        this.entityData && this.processHassUpdate();
     }
 
     /**
@@ -116,7 +106,7 @@ export class GithubEntity extends LitElement {
      */
     render() {
         return html`
-        <div class="entity-row compact-view">
+        <div class="entity-row${this.compact_view ? " compact-view" : ""}">
             <div class="icon">
                 <ha-icon icon="${this.icon}"></ha-icon>
             </div>
@@ -127,6 +117,40 @@ export class GithubEntity extends LitElement {
             ${this.attributesData.map(attributeView)}
         <div>
         `;
+    }
+
+    getEntityAttributeValues(names: string[]): number[] {
+        return names.map(n => this.entityData?.attributes[n] || 0);
+    }
+
+    private processHassUpdate() {
+        if (!this.entityData) {
+            logError("Entity not found: " + this.config.entity);
+            return;
+        }
+
+        const keywordProcessor = new KeywordStringProcessor(this.entityData.attributes, this.entityData.state);
+
+        this.name = keywordProcessor.process(this.config.name) || this.entityData.attributes["friendly_name"];
+        this.icon = this.config.icon || this.entityData.attributes["icon"];
+
+        if (this.config.secondary_info) {
+            this.secondaryInfo = keywordProcessor.process(this.config.secondary_info) as string;
+        }
+
+        const newStats = getAttributesViewData(this.config, this.entityData.attributes, keywordProcessor);
+
+        // check to avoid unnecessary re-rendering
+        if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
+            this.attributesData = newStats;
+            this.attributesUpdated = true;
+        }
+
+        // check whether we need to update the action
+        if (this.url != this.config.url) {
+            this.url = this.config.url;
+            this.action = getAction("home", this.url, this.entityData.attributes["path"], keywordProcessor);
+        }
     }
 }
 
@@ -209,7 +233,9 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
  * Gets list of attributes data to render
  */
 const getAttributesViewData = (config: IEntityConfig, data: IMap<string>, keywordProcessor: KeywordStringProcessor): IAttributeViewData[] =>
-    (config.attributes || []).map(a => {
+    safeGetArray(config.attributes).map(a => {
+        // it can come as string so making sure it's an object
+        a = safeGetConfigObject(a, "name");
         return {
             value: data[a.name],
             tooltip: attributeNameToTooltip(a.name),

@@ -4,3 +4,10 @@
     text-overflow: ellipsis;
     overflow: hidden;
 }
+
+.card-content > div {
+    margin-bottom: 8px;
+}
+.card-content > div:last-child {
+    margin-bottom: 0;
+}
