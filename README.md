@@ -246,6 +246,17 @@ resources:
     type: module
 ```
 
+## Development
+
+Card created based on [lovelace-card-boilerplate](https://github.com/maxwroc/lovelace-card-boilerplate)
+
+```
+npm install
+npm run build
+```
+
+For new features create your branch based on vNext and for fixes based on master.
+
 ## Do you like the card?
 
 Don't "buy me a coffee", just star it on github! It will be enough to let me know that you like it and definitely will give me motivation boost to continue working on it and other cards.
