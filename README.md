@@ -261,6 +261,8 @@ For new features create your branch based on vNext and for fixes based on master
 
 Don't "buy me a coffee", just star it on github! It will be enough to let me know that you like it and definitely will give me motivation boost to continue working on it and other cards.
 
+## My other HA related repos
+[battery-state-card](https://github.com/maxwroc/battery-state-card) | [homeassistant-config](https://github.com/maxwroc/homeassistant)
 
 [releases]: https://github.com/maxwroc/github-flexi-card/releases
 [releases-shield]: https://img.shields.io/github/release/maxwroc/github-flexi-card.svg?style=popout
