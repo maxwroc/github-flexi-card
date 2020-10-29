@@ -1,8 +1,8 @@
 # Github Flexi Card
 [![GitHub Release][releases-shield]][releases]
 [![GitHub All Releases][downloads-total-shield]][releases]
-<!--[![hacs_badge][hacs-shield]][hacs]
-[![Community Forum][forum-shield]][forum]-->
+[![Community Forum][forum-shield]][community-forum]
+<!--[![hacs_badge][hacs-shield]][hacs]-->
 
 Home Assistant card displaying data from [Github integration][ha-gh-integration]
 
@@ -246,17 +246,44 @@ resources:
     type: module
 ```
 
+<<<<<<< HEAD
+=======
+## Development
+
+Card created based on [lovelace-card-boilerplate](https://github.com/maxwroc/lovelace-card-boilerplate)
+
+```
+npm install
+npm run build
+```
+
+For new features create your branch based on vNext and for fixes based on master.
+
+>>>>>>> master
 ## Do you like the card?
 
 Don't "buy me a coffee", just star it on github! It will be enough to let me know that you like it and definitely will give me motivation boost to continue working on it and other cards.
 
+<<<<<<< HEAD
+=======
+## My other HA related repos
+[battery-state-card](https://github.com/maxwroc/battery-state-card) | [homeassistant-config](https://github.com/maxwroc/homeassistant) | [lovelace-card-boilerplate](https://github.com/maxwroc/lovelace-card-boilerplate)
+>>>>>>> master
 
 [releases]: https://github.com/maxwroc/github-flexi-card/releases
 [releases-shield]: https://img.shields.io/github/release/maxwroc/github-flexi-card.svg?style=popout
 [downloads-total-shield]: https://img.shields.io/github/downloads/maxwroc/github-flexi-card/total
+<<<<<<< HEAD
 [forum]: https://community.home-assistant.io/t/lovelace-battery-state-card/191535
+=======
+[community-forum]: https://community.home-assistant.io/t/lovelace-github-flexi-card/238635
+>>>>>>> master
 [forum-shield]: https://img.shields.io/badge/community-forum-brightgreen.svg?style=popout
 [hacs-shield]: https://img.shields.io/badge/HACS-Default-orange.svg
 [hacs]: https://hacs.xyz/docs/default_repositories
 [ha-gh-integration]: https://www.home-assistant.io/integrations/github/
+<<<<<<< HEAD
 [github-entity-row]: https://github.com/benct/lovelace-github-entity-row
+=======
+[github-entity-row]: https://github.com/benct/lovelace-github-entity-row
+>>>>>>> master
