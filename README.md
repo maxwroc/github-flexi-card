@@ -2,7 +2,7 @@
 [![GitHub Release][releases-shield]][releases]
 [![GitHub All Releases][downloads-total-shield]][releases]
 [![Community Forum][forum-shield]][community-forum]
-<!--[![hacs_badge][hacs-shield]][hacs]-->
+[![hacs_badge][hacs-shield]][hacs]
 
 Home Assistant card displaying data from [Github integration][ha-gh-integration]
 
@@ -236,7 +236,7 @@ entities:
 
 ## How to install?
 
-Install HACS and add this repo as custom repository (lovelace plugins). Click on "Install".
+Install via HACS. Look for the card in Frontend plugins collection.
 
 If you have a YAML mode remember to add resource entry for the js bundle in ui-lovelace.yaml:
 
