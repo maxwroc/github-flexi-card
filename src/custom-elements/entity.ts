@@ -1,6 +1,6 @@
 import { HassEntity, HomeAssistant } from "../ha-types";
 import { KeywordStringProcessor } from "../keyword-processor";
-import { html, LitElement } from "../lit-element";
+import { html, LitElement } from "lit-element";
 import { IEntityConfig, IMap } from "../types";
 import { getConfigValue, logError, safeGetArray, safeGetConfigObject } from "../utils";
 import styles from "./entity-styles";

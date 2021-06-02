@@ -1,5 +1,5 @@
 import { HomeAssistant } from "../ha-types";
-import { html, LitElement } from "../lit-element";
+import { html, LitElement } from "lit-element";
 import { ICardConfig, IEntityConfig, ISortOptions } from "../types";
 import { GithubEntity } from "./entity";
 import styles from "./card-styles";
@@ -78,7 +78,7 @@ export class GithubFlexiCard extends LitElement {
 
         if (this.entities.length != cardConfig.entities.length) {
             this.entities = cardConfig.entities.map(e => getEntityConfig(e, cardConfig)).map(entityConf => {
-                const elem = document.createElement("github-entity") as GithubEntity;
+                const elem = <unknown>document.createElement("github-entity") as GithubEntity;
                 elem.setConfig(entityConf);
                 this.cardSize++;
                 return elem;

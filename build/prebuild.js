@@ -42,7 +42,7 @@ const compileCss = async () => {
         const targetFilePath = sourceFilePath.replace(".css", "-styles.ts");
 
         const cssCode = await readFile(sourceFilePath);
-        await writeFile(targetFilePath, 'import { css } from "../lit-element"; const styles = css`' + minimizeCss(cssCode) + '`; export default styles;');
+        await writeFile(targetFilePath, 'import { css } from "lit-element"; const styles = css`' + minimizeCss(cssCode) + '`; export default styles;');
     }));
 };
 
