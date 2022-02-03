@@ -1,3 +1,8 @@
+/**
+ * This way we can import css files as modules (for TS compiler to not complain)
+ */
+declare module "*.css";
+
 interface IEntityProperties {
     attributes?: (IAttribute | string)[],
     name?: string,
@@ -8,28 +13,28 @@ interface IEntityProperties {
     compact_view?: boolean,
 }
 
-export interface ICardConfig extends IEntityProperties {
+interface ICardConfig extends IEntityProperties {
     title: string,
     entities: (IEntityConfig | string)[],
     sort?: ISortOptions[],
 }
 
-export interface IEntityConfig extends IEntityProperties{
+interface IEntityConfig extends IEntityProperties{
     entity: string,
 }
 
-export interface IAttribute {
+interface IAttribute {
     name: string,
     icon?: string,
     label?: string,
     url?: string | boolean,
 }
 
-export interface IMap<T> {
+interface IMap<T> {
     [key: string]: T
 }
 
-export interface ISortOptions {
+interface ISortOptions {
     by: string,
     ascending?: boolean,
 }

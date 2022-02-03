@@ -1,9 +1,8 @@
 import { HassEntity, HomeAssistant } from "../ha-types";
 import { KeywordStringProcessor } from "../keyword-processor";
-import { html, LitElement } from "../lit-element";
-import { IEntityConfig, IMap } from "../types";
+import { html, css, LitElement } from "../lit-element";
 import { getConfigValue, logError, safeGetArray, safeGetConfigObject } from "../utils";
-import styles from "./entity-styles";
+import styles from "./entity.css";
 
 interface IAttributeViewData {
     value: string,
@@ -39,7 +38,7 @@ export class GithubEntity extends LitElement {
      * CSS for the card
      */
     static get styles() {
-        return styles;
+        return css([styles]);
     }
 
     /**

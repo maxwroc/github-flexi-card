@@ -1,5 +1,3 @@
-import { IMap } from "./types";
-
 /**
  * Class for processing keyword strings
  */

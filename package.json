@@ -4,11 +4,10 @@
   "description": "Home assistant github card",
   "main": "dist/github-flexi-card.js",
   "scripts": {
-    "prebuild": "node build/prebuild.js",
     "build": "rollup -c",
     "prerelease": "node build/prebuild.js",
-    "release": "rollup --release -c",
-    "test": "npm run build && copy dist\\github-flexi-card.js ..\\lovelace-card-tester\\docs\\cards"
+    "release": "rollup --environment RELEASE -c",
+    "watch": "rollup -c --watch"
   },
   "repository": {
     "type": "git",
@@ -32,7 +31,11 @@
     "@rollup/plugin-node-resolve": "^9.0.0",
     "@rollup/plugin-typescript": "^6.0.0",
     "rollup": "^2.29.0",
+    "rollup-plugin-import-css": "^3.0.2",
+    "rollup-plugin-minify-html-literals": "^1.2.6",
+    "rollup-plugin-serve": "^1.1.0",
     "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-version-injector": "^1.3.3",
     "tslib": "^2.0.2",
     "typescript": "^4.0.3"
   }
