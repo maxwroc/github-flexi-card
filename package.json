@@ -5,7 +5,6 @@
   "main": "dist/github-flexi-card.js",
   "scripts": {
     "build": "rollup -c",
-    "prerelease": "node build/prebuild.js",
     "release": "rollup --environment RELEASE -c",
     "watch": "rollup -c --watch"
   },
