@@ -1,5 +1,6 @@
 :host {
     --attribute-icon-size: 20px;
+    line-height: var(--paper-font-body1_-_line-height);
 }
 
 .truncate {

@@ -42,3 +42,15 @@ interface ISortOptions {
 
 type IObjectOrString<T> = T | string;
 type ISimplifiedArray<T> = IObjectOrString<T> | IObjectOrString<T>[] | undefined;
+
+interface HomeAssistantWindow extends Window {
+    customCards: ICardInfo[] | undefined;
+}
+
+interface ICardInfo {
+    type: string;
+    name: string;
+    description: string;
+    preview?: boolean;
+    documentationURL?: string;
+}
