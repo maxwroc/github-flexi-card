@@ -1,12 +1,13 @@
 import { HomeAssistant } from "../ha-types";
 import { html, css, LitElement } from "../lit-element";
 import { GithubEntity } from "./entity";
+import { defaultConfig } from "../default-config"
 import styles from "./card.css";
-import { getConfigValue, safeGetArray, safeGetConfigObject } from "../utils";
+import { getConfigValue, safeGetArray, safeGetConfigArrayOfObjects, safeGetConfigObject } from "../utils";
 
 export class GithubFlexiCard extends LitElement {
 
-    private cardTitle: string = "";
+    private cardTitle: string | undefined | null;
 
     private entities: GithubEntity[] = [];
 
@@ -15,6 +16,8 @@ export class GithubFlexiCard extends LitElement {
     private sortOptions?: ISortOptions[];
 
     private order: number[] = [];
+
+    private config: ICardConfig;
 
     /**
      * CSS for the card
@@ -38,6 +41,22 @@ export class GithubFlexiCard extends LitElement {
      * Called whenever HS state is updated
      */
     set hass(hass: HomeAssistant) {
+
+        if (this.config.auto) {
+
+            const initializedEntities = this.entities.map(e => e.entityId);
+
+            Object.keys(hass.states).filter(entityId => entityId.endsWith(<string>this.config.auto)).forEach(entityId => {
+                // only adding entities which were not initialized already
+                if (!initializedEntities.includes(entityId)) {
+                    this.entities.push(this.getNewInitializedEntity(entityId));
+                }
+            });
+
+            // we don't want to process the list more than once
+            this.config.auto = false;
+        }
+
         this.entities.forEach(entity => entity.hass = hass);
 
         if (this.sortOptions && this.sortOptions.length) {
@@ -68,7 +87,17 @@ export class GithubFlexiCard extends LitElement {
      * Called whenever card config is updated
      */
     setConfig(cardConfig: ICardConfig) {
+
+        cardConfig = {
+            ...defaultConfig,
+            ...cardConfig
+        }
+
         this.cardTitle = cardConfig.title;
+
+        const prevEntitiesInConfig = this.config?.entities;
+
+        this.config = cardConfig;
 
         this.cardSize = 0;
 
@@ -76,22 +105,34 @@ export class GithubFlexiCard extends LitElement {
             this.cardSize++;
         }
 
-        if (this.entities.length != cardConfig.entities.length) {
-            this.entities = cardConfig.entities.map(e => getEntityConfig(e, cardConfig)).map(entityConf => {
-                const elem = document.createElement("github-entity") as GithubEntity;
-                elem.setConfig(entityConf);
-                this.cardSize++;
-                return elem;
-            });
+        const entitiesFromConfig = safeGetConfigArrayOfObjects(cardConfig.entities, "entity");
+
+        if (prevEntitiesInConfig != cardConfig.entities) {
+            this.order = [];
+            this.entities = entitiesFromConfig.map(entityConf => this.getNewInitializedEntity(entityConf));
         }
         else {
-            this.entities.forEach((entity, index) => entity.setConfig(getEntityConfig(cardConfig.entities[index], cardConfig)));
+            this.entities.forEach((entity, index) => {
+                const entityConf = getEntityConfig(entitiesFromConfig[index] || entity.entityId, cardConfig);
+                entity.setConfig(entityConf);
+            });
         }
-
-        this.order = this.entities.map((e, i) => i);
 
         const sortOptions = safeGetArray(cardConfig.sort).map(s => safeGetConfigObject(s, "by"))
         this.sortOptions = sortOptions;
+    }
+
+    private getNewInitializedEntity(confEntry: string | IEntityConfig): GithubEntity {
+
+        const entityConf = getEntityConfig(confEntry, this.config);
+
+        this.order.push(this.order.length);
+
+        const elem = document.createElement("github-entity") as GithubEntity;
+        elem.setConfig(entityConf);
+        this.cardSize++;
+
+        return elem;
     }
 
     /**
