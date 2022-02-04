@@ -12,9 +12,11 @@ interface IAttributeViewData {
     action?: Function,
 }
 
+const repoEntitySuffixes = ["forks", "issues", "latest_commit", "latest_issue", "latest_pull_request", "latest_release", "pull_requests", "stars", "watchers"];
+
 export class GithubEntity extends LitElement {
 
-    private config: IEntityConfig = <any>null;
+    // View properties start
 
     private icon: string = "mdi:github";
 
@@ -26,13 +28,19 @@ export class GithubEntity extends LitElement {
 
     private action: Function | undefined;
 
-    private url: string | boolean | undefined;
-
     private compact_view: boolean = true;
 
-    private entityData: HassEntity = <any>null;
+    // View properties end
 
-    public attributesUpdated: boolean = false;
+    private config: IEntityConfig = <any>null;
+
+    private url: string | boolean | undefined;
+
+    private _hass: HomeAssistant;
+
+    private entityPrefix: string;
+
+    private repoPath: string;
 
     /**
      * CSS for the card
@@ -64,11 +72,9 @@ export class GithubEntity extends LitElement {
             return;
         }
 
-        this.attributesUpdated = false;
+        this._hass = hass;
 
-        this.entityData = hass.states[this.config.entity];
-
-        this.processHassUpdate();
+        this.config && this.processHassUpdate();
     }
 
     /**
@@ -90,14 +96,16 @@ export class GithubEntity extends LitElement {
         // we cannot just assign the config because it is immutable and we want to change it
         this.config = JSON.parse(newConfig);
 
-        this.name = config.name || config.entity;
+        this.entityPrefix = getEntityNamePrefix(this.config.entity);
+
+        this.name = config.name || config.entity; // TODO think about creating the proper name
         config.icon && (this.icon = config.icon);
         config.secondary_info && (this.secondaryInfo = config.secondary_info);
 
         this.compact_view = getConfigValue(<boolean>config.compact_view, true);
 
         // we want the dynamic data (e.g. in keyword-strings) to be populated right away
-        this.entityData && this.processHassUpdate();
+        this._hass && this.processHassUpdate();
     }
 
     /**
@@ -118,38 +126,96 @@ export class GithubEntity extends LitElement {
         `;
     }
 
-    getEntityAttributeValues(names: string[]): number[] {
-        return names.map(n => this.entityData?.attributes[n] || 0);
-    }
+    /**
+     * Returns value of the given repo property
+     * @param name Name of the property to return
+     */
+    getRepoInfo(name: string): string {
 
-    private processHassUpdate() {
-        if (!this.entityData) {
-            logError("Entity not found: " + this.config.entity);
-            return;
+        switch (name) {
+            case "path":
+                return this.repoPath;
+            case "owner":
+                return this.repoPath.split("/")[0];
+            case "repo":
+                return this.repoPath.split("/")[1];
         }
 
-        const keywordProcessor = new KeywordStringProcessor(this.entityData.attributes, this.entityData.state);
+        const suffix = repoEntitySuffixes.find(s => name.startsWith(s));
+        if (suffix === undefined) {
+            logError("Unsupported property", true);
+        }
 
-        this.name = keywordProcessor.process(this.config.name) || this.entityData.attributes["friendly_name"];
-        this.icon = this.config.icon || this.entityData.attributes["icon"];
+        const entity = this._hass.states[this.entityPrefix + "_" + suffix];
+
+        if (!entity) {
+            logError("Entity not found: " + this.entityPrefix + "_" + suffix, true);
+        }
+
+        if (suffix == name) {
+            return entity.state;
+        }
+        else {
+            // removing suffix with underscore to get the attrib name
+            return entity.attributes[name.substr(suffix!.length + 1)];
+        }
+    }
+
+    /**
+     * Triggered whenever sonfig or hass updates/changes
+     */
+    private processHassUpdate() {
+
+        const entity = this._hass.states[this.config.entity];
+
+        const friendlyName = <string>entity.attributes["friendly_name"];
+        this.repoPath = friendlyName.substr(0, friendlyName.indexOf(" "));
+
+        const keywordProcessor = new KeywordStringProcessor(match => this.getRepoInfo(match));
+
+        this.name = keywordProcessor.process(this.config.name) || this.repoPath;
+        this.icon = this.config.icon || entity.attributes["icon"];
 
         if (this.config.secondary_info) {
             this.secondaryInfo = keywordProcessor.process(this.config.secondary_info) as string;
         }
 
-        const newStats = getAttributesViewData(this.config, this.entityData.attributes, keywordProcessor);
+        const newStats = this.getAttributesViewData(keywordProcessor);
 
         // check to avoid unnecessary re-rendering
         if (JSON.stringify(newStats) != JSON.stringify(this.attributesData)) {
             this.attributesData = newStats;
-            this.attributesUpdated = true;
         }
 
         // check whether we need to update the action
         if (this.url != this.config.url) {
             this.url = this.config.url;
-            this.action = getAction("home", this.url, this.entityData.attributes["path"], keywordProcessor);
+            this.action = getAction("home", this.url, this.repoPath, keywordProcessor);
         }
+    }
+
+    /**
+     * Generates attributes collection to display
+     * @param keywordProcessor KString processor
+     */
+    private getAttributesViewData(keywordProcessor: KeywordStringProcessor) {
+        return safeGetArray(this.config.attributes).map(a => {
+            // it can come as string so making sure it's an object
+            a = safeGetConfigObject(a, "name");
+            return {
+                value: this.getRepoInfo(a.name),
+                tooltip: attributeNameToTooltip(a.name),
+                icon: a.icon || nameToIconMap[a.name],
+                label: a.label && keywordProcessor.process(a.label),
+                action: getAction(
+                    a.name,
+                    // if attrib url property is missing use the entity-level setting
+                    a.url !== undefined ? a.url : this.config.attribute_urls,
+                    this.repoPath,
+                    keywordProcessor
+                ),
+            }
+        });
     }
 }
 
@@ -168,30 +234,32 @@ const attributeView = (attr: IAttributeViewData) => html`
  * Attribute name to icon map
  */
 const nameToIconMap: IMap<string> = {
-    "open_issues": "mdi:alert-circle-outline",
-    "open_pull_requests": "mdi:source-pull",
-    "stargazers": "mdi:star",
     "forks": "mdi:source-fork",
-    "latest_release_tag": "mdi:tag-outline",
-    "clones": "mdi:download-outline",
-    "clones_unique": "mdi:download-outline",
-    "views": "mdi:eye",
-    "views_unique": "mdi:eye-check",
+    "issues": "mdi:alert-circle-outline",
+    "pull_requests": "mdi:source-pull",
+    "stars": "mdi:star",
+    "latest_release": "mdi:tag-outline",
+    "watchers": "mdi:glasses",
+    // "clones": "mdi:download-outline",
+    // "clones_unique": "mdi:download-outline",
+    // "views": "mdi:eye",
+    // "views_unique": "mdi:eye-check",
 }
 
 /**
  * Attribute name to url path map
  */
 const nameToUrlPathMap: IMap<string> = {
-    "open_issues": "issues",
-    "open_pull_requests": "pulls",
-    "stargazers": "stargazers",
     "forks": "network/members",
-    "latest_release_tag": "releases",
-    "clones": "graphs/traffic",
-    "clones_unique": "graphs/traffic",
-    "views": "graphs/traffic",
-    "views_unique": "graphs/traffic",
+    "issues": "issues",
+    "pull_requests": "pulls",
+    "stars": "stargazers",
+    "latest_release": "releases",
+    "watchers": "watchers",
+    // "clones": "graphs/traffic",
+    // "clones_unique": "graphs/traffic",
+    // "views": "graphs/traffic",
+    // "views_unique": "graphs/traffic",
     "home": ""
 }
 
@@ -229,28 +297,19 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
 }
 
 /**
- * Gets list of attributes data to render
- */
-const getAttributesViewData = (config: IEntityConfig, data: IMap<string>, keywordProcessor: KeywordStringProcessor): IAttributeViewData[] =>
-    safeGetArray(config.attributes).map(a => {
-        // it can come as string so making sure it's an object
-        a = safeGetConfigObject(a, "name");
-        return {
-            value: data[a.name],
-            tooltip: attributeNameToTooltip(a.name),
-            icon: a.icon || nameToIconMap[a.name],
-            label: a.label && keywordProcessor.process(a.label),
-            action: getAction(
-                a.name,
-                // if attrib url property is missing use the entity-level setting
-                a.url !== undefined ? a.url : config.attribute_urls,
-                data["path"],
-                keywordProcessor
-            ),
-        }
-    });
-
-/**
  * Converts attribute name to formatted tooltip text
  */
 const attributeNameToTooltip = (name: string): string => name.substr(0, 1).toUpperCase() + name.substr(1).replace(/_/g, " ");
+
+/**
+ * Gets the entity name prefix
+ *
+ * @param entity Source entity name
+ * @description
+ *      Github integration for every repo creates entities with a common prefix. This function
+ *      converts any original entity name to the common prefix.
+ */
+const getEntityNamePrefix = (entity: string): string => {
+    const suffix = repoEntitySuffixes.find(s => entity.endsWith(s));
+    return suffix !== undefined ? entity.replace("_" + suffix, "") : entity;
+}

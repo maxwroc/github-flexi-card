@@ -7,7 +7,13 @@ export const printVersion = () => console.info(
 /**
  * Logs error in the browser dev console with card name prefix
  */
-export const logError = (msg: string) => console.error(`[github-flexi-card] ${msg}`);
+export const logError = (msg: string, andThrow?: boolean) => {
+    console.error(`[github-flexi-card] ${msg}`);
+
+    if (andThrow) {
+        throw new Error(msg);
+    }
+};
 
 /**
  * Gets the config value returning first not undefined value passed as arguments
