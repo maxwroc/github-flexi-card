@@ -18,6 +18,8 @@ Note: If you plan to use it only as entity row you can consider using the other 
 
 ## Configuration
 
+Note: Please **do not change** the original entity IDs otherwise card won't be able to find related entities.
+
 ### Card
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
@@ -53,6 +55,24 @@ Note: If you plan to use it only as entity row you can consider using the other 
 | url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
 | label | [KString](#keywordstring) |  | v0.5.0 | Label/text which will be shown instead of the icon
 
+### Attribute names
+
+Attribute names are entity suffixes, like `pull_requests` in the example below. This will return the state value of the entity.
+
+![image](https://user-images.githubusercontent.com/8268674/152525143-0205c4c3-c79d-4038-b3a9-48753d2ebf0d.png)
+
+You can access **entity** attributes by adding an underscore with the name of the attribute. E.g. if you want to get the `tag` attribute from `*_latest_release` entity you can use `latest_release_tag` as the attribute name in the configuration.
+
+![image](https://user-images.githubusercontent.com/8268674/152525501-efea7c65-0ad6-473a-817c-00c91dab4c46.png)
+
+Special attributes:
+
+| Name | Description |
+|:-----|:-----|
+| path | Repository path e.g. `maxwroc/github-flexi-card` |
+| owner | First part of repository path e.g. `maxwroc` for the `maxwroc/github-flexi-card` repo
+| repo | Second part of repository path e.g. `github-flexi-card` for the `maxwroc/github-flexi-card` repo
+
 ### Sort options
 
 | Name | Type | Default | Since | Description |
@@ -67,11 +87,9 @@ KeywordString is a string which can contain special keywords. Keywords are the a
 
 E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
-![image](https://user-images.githubusercontent.com/8268674/95771623-4ddde880-0cb3-11eb-9265-57876a08bd6e.png)
-
 #### Converting keyword value
 
-You can do simple replace operation on the value e.g.: `"{name:Github=Project}"`. It will replace `"Github"` string in the `name` value with `"Project"`, so if your name attribute is `"Github github-flexi-card"` then the final result will be `"Project github-flexi-card"`.
+You can do simple replace operation on the value e.g.: `"{latest_release_friendly_name:Github=Project}"`. It will get the `friendly_name` attribute from `*_latest_release` entity and it will replace `"Github"` string in it with value `"Project"`, so if your friendly_name attribute is `"Github github-flexi-card"` then the final result will be `"Project github-flexi-card"`.
 
 Note: It is very simple replace machanism, it is case sensitive, replaces only first match and it doesn't have any escape chars so you cannot use characters like `=` or `:` in the search word nor target word.
 
@@ -83,32 +101,30 @@ Note: It is very simple replace machanism, it is case sensitive, replaces only f
 type: 'custom:github-flexi-card'
 title: Github projects
 entities:
-  - entity: sensor.battery_state_card
+  - entity: sensor.maxwroc_battery_state_card_latest_release
     secondary_info: 'Released {latest_release_tag}'
     url: "{latest_release_url}" # url taken from attribute
     attributes:
-      - name: views
-        url: true # default url to graphs/traffic
-      - name: stargazers
-      - name: open_issues
-      - name: clones
+      - name: stars
+        url: true # default url to /stargazers
+      - name: issues
         url: "https://my.custom.url/path"
       - name: forks
-      - name: open_pull_requests
-        url: "{latest_open_pull_request_url}" # url taken from attribute
+      - name: pull_requests
+        url: "{latest_pull_request_url}" # url taken from attribute
   - entity: sensor.hideseek_mod
     url: true # default url - repo homepage
     attributes:
       - views
-      - stargazers
+      - stars
       - forks
   - entity: sensor.urleditorpro
     name: 'Url Editor Pro (v{latest_release_tag})'
-    secondary_info: 'Clones: {clones}'
+    secondary_info: '{latest_pull_request}'
     attributes:
       - views
-      - stargazers
-      - open_issues
+      - stars
+      - issues
 ```
 
 ### Entity
@@ -129,12 +145,11 @@ entities:
     url: true
     attribute_urls: true
     attributes:
-      - views
-      - stargazers
-      - open_issues
-      - clones
+      - stars
+      - issues
       - forks
-      - open_pull_requests
+      - pull_requests
+      - watchers
   - sensor.hassio_online
   - sensor.last_boot
   - sensor.processor_use
@@ -154,11 +169,11 @@ url: true
 attribute_urls: true
 attributes:
   - views
-  - stargazers
-  - open_issues
-  - clones
+  - stars
+  - issues
+  - watchers
   - forks
-  - open_pull_requests
+  - pull_requests
 entities:
   - sensor.battery_state_card
   - sensor.hideseek_mod
@@ -177,9 +192,9 @@ attribute_urls: true
 attributes:
   - name: views
     label: Views
-  - name: stargazers
+  - name: stars
     label: Stars
-  - name: open_issues
+  - name: issues
     label: Issues
 entities:
   - sensor.battery_state_card
@@ -197,8 +212,8 @@ title: Big icons
 url: true
 attribute_urls: true
 attributes:
-  - views
-  - stargazers
+  - watchers
+  - stars
 entities:
   - sensor.battery_state_card
   - entity: sensor.hideseek_mod
@@ -212,18 +227,18 @@ entities:
 
 ```yaml
 type: 'custom:github-flexi-card'
-title: Sort by starts and views (asc)
+title: Sort by starts and forks (asc)
 secondary_info: '{latest_release_tag}'
 url: true
 attribute_urls: true
 attributes:
-  - views_unique
-  - stargazers
-  - open_issues
-  - open_pull_requests
+  - watchers
+  - stars
+  - issues
+  - forks
 sort:
-  - by: stargazers
-  - by: views_unique
+  - by: stars
+  - by: forks
     ascending: true
 entities:
   - sensor.battery_state_card
