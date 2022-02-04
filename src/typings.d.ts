@@ -4,7 +4,7 @@
 declare module "*.css";
 
 interface IEntityProperties {
-    attributes?: (IAttribute | string)[],
+    attributes?: ISimplifiedArray<IAttribute>,
     name?: string,
     secondary_info?: string,
     icon?: string,
@@ -14,9 +14,10 @@ interface IEntityProperties {
 }
 
 interface ICardConfig extends IEntityProperties {
-    title: string,
-    entities: (IEntityConfig | string)[],
-    sort?: ISortOptions[],
+    title?: string,
+    entities: ISimplifiedArray<IEntityConfig>,
+    sort?: ISimplifiedArray<ISortOptions>,
+    auto?: boolean | string,
 }
 
 interface IEntityConfig extends IEntityProperties{
@@ -38,3 +39,6 @@ interface ISortOptions {
     by: string,
     ascending?: boolean,
 }
+
+type IObjectOrString<T> = T | string;
+type ISimplifiedArray<T> = IObjectOrString<T> | IObjectOrString<T>[] | undefined;

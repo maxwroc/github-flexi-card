@@ -1,7 +1,7 @@
 import { HassEntity, HomeAssistant } from "../ha-types";
 import { KeywordStringProcessor } from "../keyword-processor";
 import { html, css, LitElement } from "../lit-element";
-import { getConfigValue, logError, safeGetArray, safeGetConfigObject } from "../utils";
+import { logError, getConfigValue, safeGetConfigArrayOfObjects } from "../utils";
 import styles from "./entity.css";
 
 interface IAttributeViewData {
@@ -18,6 +18,8 @@ interface IAttributeViewData {
 const repoEntitySuffixes = ["forks", "issues", "latest_commit", "latest_issue", "latest_pull_request", "latest_release", "pull_requests", "stars", "watchers"];
 
 export class GithubEntity extends LitElement {
+
+    public entityId: string;
 
     // View properties start
 
@@ -96,6 +98,8 @@ export class GithubEntity extends LitElement {
             return;
         }
 
+        this.entityId = config.entity;
+
         // we cannot just assign the config because it is immutable and we want to change it
         this.config = JSON.parse(newConfig);
 
@@ -146,7 +150,7 @@ export class GithubEntity extends LitElement {
 
         const suffix = repoEntitySuffixes.find(s => name.startsWith(s));
         if (suffix === undefined) {
-            logError("Unsupported property", true);
+            logError("Unsupported property: " + name, true);
         }
 
         const entity = this._hass.states[this.entityPrefix + "_" + suffix];
@@ -170,6 +174,10 @@ export class GithubEntity extends LitElement {
     private processHassUpdate() {
 
         const entity = this._hass.states[this.config.entity];
+
+        if (!entity) {
+            logError("[processHassUpdate] Entity not found: " + this.config.entity, true);
+        }
 
         const friendlyName = <string>entity.attributes["friendly_name"];
         this.repoPath = friendlyName.substr(0, friendlyName.indexOf(" "));
@@ -202,9 +210,7 @@ export class GithubEntity extends LitElement {
      * @param keywordProcessor KString processor
      */
     private getAttributesViewData(keywordProcessor: KeywordStringProcessor) {
-        return safeGetArray(this.config.attributes).map(a => {
-            // it can come as string so making sure it's an object
-            a = safeGetConfigObject(a, "name");
+        return safeGetConfigArrayOfObjects(this.config.attributes, "name").map(a => {
             return {
                 value: this.getRepoInfo(a.name),
                 tooltip: attributeNameToTooltip(a.name),

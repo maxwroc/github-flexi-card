@@ -20,12 +20,17 @@ Note: If you plan to use it only as entity row you can consider using the other 
 
 Note: Please **do not change** the original entity IDs otherwise card won't be able to find related entities.
 
+### Default configuration
+
+Please see the following file: [default-config.ts](https://github.com/maxwroc/github-flexi-card/blob/master/src/default-config.ts)
+
 ### Card
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | title | string |  | v0.1.0 | Card header/title text
-| entities | list([Entity](#entity)) \| string | **(required)** | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
+| entities | list([Entity](#entity)) \| string |  | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
 | sort | list([SortOptions](#sort-options)) |  | v1.0.0 | Sort options collection (order matters). Every next sorting option is used fot the next level sorting (if the values of the previous one are same)
+| auto | string \| `false` | `"_latest_release"` | v2.0.0 | Whether to add entities automatically based on the entity ID suffix. You can specify here a different suffix which should be used to find entities
 
 [+ Entity Properties](#Entity-Properties) - applied to all entities
 
