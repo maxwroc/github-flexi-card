@@ -42,7 +42,8 @@ export class GithubFlexiCard extends LitElement {
 
         if (this.sortOptions && this.sortOptions.length) {
             const attrNames = this.sortOptions.map(s => s.by);
-            const values = this.entities.map(e => e.getEntityAttributeValues(attrNames));
+            const values = this.entities.map(e =>
+                attrNames.map(attr => Number(e.getRepoInfo(attr))));
 
             const applySortType = (a: number, b: number, ascending?: boolean) => ascending ? a - b : b - a;
 

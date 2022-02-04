@@ -2,10 +2,7 @@
  * Class for processing keyword strings
  */
 export class KeywordStringProcessor {
-    constructor(private data: IMap<string>, state: string) {
-        if (!this.data["state"]) {
-            this.data["state"] = state;
-        }
+    constructor(private onMatch: { (match: string): string }) {
     }
 
     /**
@@ -27,7 +24,7 @@ export class KeywordStringProcessor {
         const attributeName = chunks[0];
         const processingDetails = chunks[1];
 
-        const value = this.data[attributeName];
+        const value = this.onMatch(attributeName);
 
         if (value === undefined) {
             return defaultValue;
