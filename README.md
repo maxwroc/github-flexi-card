@@ -62,15 +62,17 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 
 ### Attribute names
 
-Attribute names are entity suffixes, like `pull_requests` in the example below. This will return the state value of the entity.
+When you enable Github Integration it creates couple entities for every repo. Each entity for single repo has a common prefix e.g. "sensor.maxwroc_github_flexi_card_". The last part of the entity name is (what I call here) repo attribute e.g. for "sensor.maxwroc_github_flexi_card_pull_requests" entity the attribute name is "pull_requests".
 
 ![image](https://user-images.githubusercontent.com/8268674/152525143-0205c4c3-c79d-4038-b3a9-48753d2ebf0d.png)
 
-You can access **entity** attributes by adding an underscore with the name of the attribute. E.g. if you want to get the `tag` attribute from `*_latest_release` entity you can use `latest_release_tag` as the attribute name in the configuration.
+I suggest to enable "Diagnostic" entities for your repo(s) on the [devices](https://my.home-assistant.io/redirect/devices/) page.
+
+It is possible to access **entity** attributes by adding an underscore with the name of the attribute. E.g. if you want to get the `tag` attribute from `*_latest_release` entity you can use `latest_release_tag` as the attribute name in the configuration.
 
 ![image](https://user-images.githubusercontent.com/8268674/152525501-efea7c65-0ad6-473a-817c-00c91dab4c46.png)
 
-Special attributes:
+Special repo attributes:
 
 | Name | Description |
 |:-----|:-----|
@@ -88,15 +90,19 @@ Special attributes:
 
 ### KeywordString
 
-KeywordString is a string which can contain special keywords. Keywords are the attribute names surrounded by curly brackets. Keywords in the string will be replaced by attribute values.
+KeywordString is a string which can contain special keywords. Keywords are the repo attribute names surrounded by curly brackets. Keywords in the string will be replaced by attribute values.
 
 E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
 
 #### Converting keyword value
 
-You can do simple replace operation on the value e.g.: `"{latest_release_friendly_name:Github=Project}"`. It will get the `friendly_name` attribute from `*_latest_release` entity and it will replace `"Github"` string in it with value `"Project"`, so if your friendly_name attribute is `"Github github-flexi-card"` then the final result will be `"Project github-flexi-card"`.
+Keywords support simple functions to convert the values
 
-Note: It is very simple replace machanism, it is case sensitive, replaces only first match and it doesn't have any escape chars so you cannot use characters like `=` or `:` in the search word nor target word.
+| Func | Example | Description |
+|:-----|:-----|:-----|
+| replace(\[old_string\]=\[new_string\]) | `{latest_release|replace(Github=Project})}` | Simple replace. E.g. if name contains "Github" string then it will be replaced by "Project"
+| conditional() | `{latest_release_tag|conditional()}` | If the value doesn't exist nothing is rendered (the default behaviour is to render the keyword)
+| round(\[number\]) | `{state\|round(2)}` | Rounds the value to number of fractional digits. Not very useful for this card I think (the KString processing code was copied from the other card so I just left this func)
 
 ## Configuration examples
 
