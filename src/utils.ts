@@ -4,6 +4,9 @@ export const printVersion = () => console.info(
     "color: #cca900; background: white; font-weight: 700;",
 );
 
+/**
+ * Cache for messages logged in the console already
+ */
 let logCache: IMap<number> = {};
 
 /**
