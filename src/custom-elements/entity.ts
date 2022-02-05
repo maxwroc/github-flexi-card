@@ -1,7 +1,7 @@
-import { HassEntity, HomeAssistant } from "../ha-types";
-import { KeywordStringProcessor } from "../keyword-processor";
+import { HomeAssistant } from "../ha-types";
 import { html, css, LitElement } from "../lit-element";
-import { logError, getConfigValue, safeGetConfigArrayOfObjects } from "../utils";
+import { RichStringProcessor } from "../rich-string-processor";
+import { logError, getConfigValue, safeGetConfigArrayOfObjects, resetLogCache } from "../utils";
 import styles from "./entity.css";
 
 interface IAttributeViewData {
@@ -93,6 +93,8 @@ export class GithubEntity extends LitElement {
             return;
         }
 
+        resetLogCache();
+
         if (!config.entity) {
             logError("Missing 'entity' property in entity configuration");
             return;
@@ -137,7 +139,7 @@ export class GithubEntity extends LitElement {
      * Returns value of the given repo property
      * @param name Name of the property to return
      */
-    getRepoInfo(name: string): string {
+    getRepoInfo(name: string): string | undefined {
 
         switch (name) {
             case "path":
@@ -156,7 +158,8 @@ export class GithubEntity extends LitElement {
         const entity = this._hass.states[this.entityPrefix + "_" + suffix];
 
         if (!entity) {
-            logError("Entity not found: " + this.entityPrefix + "_" + suffix, true);
+            logError("Entity not found: " + this.entityPrefix + "_" + suffix);
+            return;
         }
 
         if (suffix == name) {
@@ -182,7 +185,7 @@ export class GithubEntity extends LitElement {
         const friendlyName = <string>entity.attributes["friendly_name"];
         this.repoPath = friendlyName.substr(0, friendlyName.indexOf(" "));
 
-        const keywordProcessor = new KeywordStringProcessor(match => this.getRepoInfo(match));
+        const keywordProcessor = new RichStringProcessor(match => this.getRepoInfo(match));
 
         this.name = keywordProcessor.process(this.config.name) || this.repoPath;
         this.icon = this.config.icon || entity.attributes["icon"];
@@ -209,22 +212,24 @@ export class GithubEntity extends LitElement {
      * Generates attributes collection to display
      * @param keywordProcessor KString processor
      */
-    private getAttributesViewData(keywordProcessor: KeywordStringProcessor) {
-        return safeGetConfigArrayOfObjects(this.config.attributes, "name").map(a => {
-            return {
-                value: this.getRepoInfo(a.name),
-                tooltip: attributeNameToTooltip(a.name),
-                icon: a.icon || nameToIconMap[a.name],
-                label: a.label && keywordProcessor.process(a.label),
-                action: getAction(
-                    a.name,
-                    // if attrib url property is missing use the entity-level setting
-                    a.url !== undefined ? a.url : this.config.attribute_urls,
-                    this.repoPath,
-                    keywordProcessor
-                ),
-            }
-        });
+    private getAttributesViewData(keywordProcessor: RichStringProcessor): IAttributeViewData[] {
+        return safeGetConfigArrayOfObjects(this.config.attributes, "name")
+            .map(a => {
+                const val = this.getRepoInfo(a.name);
+                return <IAttributeViewData>{
+                    value: val === undefined ? "?" : val,
+                    tooltip: attributeNameToTooltip(a.name),
+                    icon: a.icon || nameToIconMap[a.name],
+                    label: a.label && keywordProcessor.process(a.label),
+                    action: getAction(
+                        a.name,
+                        // if attrib url property is missing use the entity-level setting
+                        a.url !== undefined ? a.url : this.config.attribute_urls,
+                        this.repoPath,
+                        keywordProcessor
+                    ),
+                }
+            });
     }
 }
 
@@ -275,7 +280,7 @@ const nameToUrlPathMap: IMap<string> = {
 /**
  * Creates action for clickable elements
  */
-const getAction = (attributeName: string, url: boolean | string | undefined, path: string, keywordProcessor: KeywordStringProcessor): Function | undefined => {
+const getAction = (attributeName: string, url: boolean | string | undefined, path: string, keywordProcessor: RichStringProcessor): Function | undefined => {
     switch (typeof url) {
         case "boolean":
             if (!url) {
