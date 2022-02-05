@@ -4,11 +4,28 @@ export const printVersion = () => console.info(
     "color: #cca900; background: white; font-weight: 700;",
 );
 
+let logCache: IMap<number> = {};
+
+/**
+ * Clears the log cache to enable logging same messages again
+ */
+export const resetLogCache = () => logCache = {};
+
 /**
  * Logs error in the browser dev console with card name prefix
  */
 export const logError = (msg: string, andThrow?: boolean) => {
+
+    if (logCache[msg]) {
+        if (andThrow) {
+            throw new Error(msg);
+        }
+
+        return;
+    }
+
     console.error(`[github-flexi-card] ${msg}`);
+    logCache[msg] = 1
 
     if (andThrow) {
         throw new Error(msg);

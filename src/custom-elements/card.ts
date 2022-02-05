@@ -64,8 +64,6 @@ export class GithubFlexiCard extends LitElement {
             const values = this.entities.map(e =>
                 attrNames.map(attr => Number(e.getRepoInfo(attr))));
 
-            const applySortType = (a: number, b: number, ascending?: boolean) => ascending ? a - b : b - a;
-
             // default order matches the config
             const defaultOrder = this.entities.map((e, i) => i);
             const newOrder = defaultOrder.sort(
@@ -158,6 +156,20 @@ export class GithubFlexiCard extends LitElement {
         </ha-card>
         `;
     }
+}
+
+/**
+ * Swaps sorting option depending on a given param
+ * @param a Value A
+ * @param b Value B
+ * @param ascending Whether to reverse sort
+ */
+const applySortType = (a: number, b: number, ascending?: boolean) => {
+    // NaN values placed at the bottom of the list
+    if (isNaN(a)) return 1;
+    if (isNaN(b)) return -1;
+
+    return ascending ? a - b : b - a;
 }
 
 /**
