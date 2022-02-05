@@ -3,25 +3,24 @@
  */
 declare module "*.css";
 
-interface IEntityProperties {
-    attributes?: ISimplifiedArray<IAttribute>,
-    name?: string,
-    secondary_info?: string,
-    icon?: string,
-    url?: string | boolean,
-    attribute_urls?: boolean,
-    compact_view?: boolean,
-}
-
-interface ICardConfig extends IEntityProperties {
+interface ICardConfig extends Omit<IEntityConfig, "entity"> {
     title?: string,
     entities: ISimplifiedArray<IEntityConfig>,
     sort?: ISimplifiedArray<ISortOptions>,
     auto?: boolean | string,
 }
 
-interface IEntityConfig extends IEntityProperties{
+interface IEntityConfig {
     entity: string,
+    attributes?: ISimplifiedArray<IAttribute>,
+    name?: string,
+    secondary_info?: string,
+    icon?: string,
+    icon_color?: string,
+    url?: string | boolean,
+    attribute_urls?: boolean,
+    attribute_color?: string,
+    compact_view?: boolean,
 }
 
 interface IAttribute {
@@ -29,6 +28,7 @@ interface IAttribute {
     icon?: string,
     label?: string,
     url?: string | boolean,
+    color?: string,
 }
 
 interface IMap<T> {

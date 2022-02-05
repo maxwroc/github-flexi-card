@@ -193,7 +193,9 @@ const getEntityConfig = (configEntry: IEntityConfig | string, cardConfig: ICardC
     // if property is not defined take the card-level one
     entityConfig.attributes = getConfigValue(entityConfig.attributes, cardConfig.attributes);
     entityConfig.attribute_urls = getConfigValue(entityConfig.attribute_urls, cardConfig.attribute_urls);
+    entityConfig.attribute_color = getConfigValue(entityConfig.attribute_color, cardConfig.attribute_color);
     entityConfig.icon = getConfigValue(entityConfig.icon, cardConfig.icon);
+    entityConfig.icon_color = getConfigValue(entityConfig.icon_color, cardConfig.icon_color);
     entityConfig.name = getConfigValue(entityConfig.name, cardConfig.name);
     entityConfig.secondary_info = getConfigValue(entityConfig.secondary_info, cardConfig.secondary_info);
     entityConfig.url = getConfigValue(entityConfig.url, cardConfig.url);

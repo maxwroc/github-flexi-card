@@ -49,7 +49,9 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 | attributes | list([Attribute](#attribute)) |  | v0.1.0 | Attributes to display
 | url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
 | attribute_urls | bool |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
+| attribute_color | string | `var(--primary-color)` | v2.0.0 | Color applied to all attributes (icons or labels)
 | icon | string | `"mdi:github"` | v0.2.0 | Override for entity icon
+| icon_color | string |  | v2.0.0 | Icon color override
 | compact_view | bool | `true` | v1.0.0 | When set to `false` big icons (and values) are displayed
 
 ### Attribute
@@ -59,6 +61,7 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 | icon | string |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
 | url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
 | label | [KString](#keywordstring) |  | v0.5.0 | Label/text which will be shown instead of the icon
+| color | string | `var(--primary-color)` | v2.0.0 | Icon / label color
 
 ### Attribute names
 
