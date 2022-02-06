@@ -133,7 +133,7 @@ export class GithubEntity extends LitElement {
             </div>
             <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
                 ${this.name}
-                ${this.secondaryInfo && html`<div class="secondary">${this.secondaryInfo}</div>`}
+                ${this.secondaryInfo && html`<div class="secondary truncate">${this.secondaryInfo}</div>`}
             </div>
             ${this.attributesData.map(attributeView)}
         <div>
