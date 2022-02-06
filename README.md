@@ -103,7 +103,7 @@ Keywords support simple functions to convert the values
 
 | Func | Example | Description |
 |:-----|:-----|:-----|
-| `replace([old_string]=[new_string])` | `{latest_release\|replace(Git=Proj)}` | Simple replace. E.g. if name contains "Git" string then it will be replaced by "Proj"
+| `replace([old_string],[new_string])` | `{latest_release\|replace(Git,Proj)}` | Simple replace. E.g. if name contains "Git" string then it will be replaced by "Proj"
 | `conditional()` | `{latest_release_tag\|conditional()}` | If the value doesn't exist nothing is rendered (the default behaviour is to render the keyword)
 | `round([number])` | `{state\|round(2)}` | Rounds the value to number of fractional digits. Not very useful for this card I think (the KString processing code was copied from the other card so I just left this func)
 

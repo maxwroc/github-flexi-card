@@ -49,9 +49,9 @@ const commandPattern = /(?<func>[a-z]+)\((?<params>[^\)]*)\)/;
 
 const availableProcessors: IMap<IProcessorCtor> = {
     "replace": (params) => {
-        const replaceDataChunks = params.split("=");
+        const replaceDataChunks = params.split(",");
         if (replaceDataChunks.length != 2) {
-            logError("'replace' function param has to have single equal char");
+            logError("'replace' function param has to have two parameters");
             return undefined;
         }
 
