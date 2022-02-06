@@ -10,6 +10,7 @@ interface IAttributeViewData {
     icon?: string,
     label?: string,
     action?: Function,
+    color?: string,
 }
 
 /**
@@ -24,6 +25,8 @@ export class GithubEntity extends LitElement {
     // View properties start
 
     private icon: string = "mdi:github";
+
+    private iconColor: string = "var(--paper-item-icon-color)";
 
     private name: string = "";
 
@@ -60,6 +63,7 @@ export class GithubEntity extends LitElement {
     static get properties() {
         return {
             icon: { type: String },
+            iconColor: { type: String },
             name: { type: String },
             secondaryInfo: { type: String },
             attributesData: { type: Array },
@@ -109,6 +113,7 @@ export class GithubEntity extends LitElement {
 
         this.name = config.name || config.entity; // TODO think about creating the proper name
         config.icon && (this.icon = config.icon);
+        config.icon_color && (this.iconColor = config.icon_color);
         config.secondary_info && (this.secondaryInfo = config.secondary_info);
 
         this.compact_view = getConfigValue(<boolean>config.compact_view, true);
@@ -124,7 +129,7 @@ export class GithubEntity extends LitElement {
         return html`
         <div class="entity-row${this.compact_view ? " compact-view" : ""}">
             <div class="icon">
-                <ha-icon icon="${this.icon}"></ha-icon>
+                <ha-icon icon="${this.icon}" style="color: ${this.iconColor}"></ha-icon>
             </div>
             <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
                 ${this.name}
@@ -221,6 +226,7 @@ export class GithubEntity extends LitElement {
                     tooltip: attributeNameToTooltip(a.name),
                     icon: a.icon || nameToIconMap[a.name],
                     label: a.label && keywordProcessor.process(a.label),
+                    color: a.color || this.config.attribute_color || "var(--primary-color)",
                     action: getAction(
                         a.name,
                         // if attrib url property is missing use the entity-level setting
@@ -238,8 +244,8 @@ export class GithubEntity extends LitElement {
  */
 const attributeView = (attr: IAttributeViewData) => html`
 <div class="state${attr.action ? " clickable" : ""}" @click="${attr.action}" title="${attr.tooltip}">
-    ${attr.label && html`<div class="label">${attr.label}</div>`}
-    ${(attr.icon && !attr.label) ? html`<ha-icon icon="${attr.icon}" style="color: var(--primary-color)"></ha-icon>` : null}
+    ${attr.label && html`<div class="label" style="color: ${attr.color}">${attr.label}</div>`}
+    ${(attr.icon && !attr.label) ? html`<ha-icon icon="${attr.icon}" style="color: ${attr.color}"></ha-icon>` : null}
     <div>${attr.value}</div>
 </div>
 `;
