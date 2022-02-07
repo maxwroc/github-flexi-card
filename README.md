@@ -275,6 +275,11 @@ resources:
     type: module
 ```
 
+## Automation
+
+If you want to receive notifications whenever something changes with the repo you can use my automation as an example:
+https://github.com/maxwroc/homeassistant/blob/master/configuration/packages/github.yaml
+
 ## Development
 
 Card created based on [lovelace-card-boilerplate](https://github.com/maxwroc/lovelace-card-boilerplate)
