@@ -1,7 +1,7 @@
 import { HomeAssistant } from "../ha-types";
 import { html, css, LitElement } from "../lit-element";
 import { RichStringProcessor } from "../rich-string-processor";
-import { logError, getConfigValue, safeGetConfigArrayOfObjects, resetLogCache } from "../utils";
+import { logError, getConfigValue, safeGetConfigArrayOfObjects, resetLogCache, isNumber } from "../utils";
 import styles from "./entity.css";
 
 interface IAttributeViewData {
@@ -30,7 +30,7 @@ export class GithubEntity extends LitElement {
 
     private name: string = "";
 
-    private secondaryInfo: string;
+    private secondaryInfo: string | Date | undefined;
 
     private attributesData: IAttributeViewData[] = [];
 
@@ -133,7 +133,7 @@ export class GithubEntity extends LitElement {
             </div>
             <div class="name truncate${this.action ? " clickable" : ""}" @click="${this.action}">
                 ${this.name}
-                ${this.secondaryInfo && html`<div class="secondary truncate">${this.secondaryInfo}</div>`}
+                ${this.secondaryInfo instanceof Date ? secondaryInfoTime(this._hass, this.secondaryInfo) : secondaryInfo(this.secondaryInfo)}
             </div>
             ${this.attributesData.map(attributeView)}
         <div>
@@ -196,7 +196,21 @@ export class GithubEntity extends LitElement {
         this.icon = this.config.icon || entity.attributes["icon"];
 
         if (this.config.secondary_info) {
-            this.secondaryInfo = keywordProcessor.process(this.config.secondary_info) as string;
+
+            let secondaryInfo: string | Date | undefined = keywordProcessor.process(this.config.secondary_info);
+
+            if (secondaryInfo != undefined) {
+                // check if this can be a date
+                // condition is little bit weird but we don't want accidental values to be converted to date like "0.8.4"
+                if (secondaryInfo.length > 20) {
+                    const dateTime = Date.parse(secondaryInfo);
+                    if (!isNaN(dateTime)) {
+                        secondaryInfo = new Date(dateTime);
+                    }
+                }
+
+                this.secondaryInfo = secondaryInfo;
+            }
         }
 
         const newStats = this.getAttributesViewData(keywordProcessor);
@@ -247,6 +261,16 @@ const attributeView = (attr: IAttributeViewData) => html`
     ${attr.label && html`<div class="label" style="color: ${attr.color}">${attr.label}</div>`}
     ${(attr.icon && !attr.label) ? html`<ha-icon icon="${attr.icon}" style="color: ${attr.color}"></ha-icon>` : null}
     <div>${attr.value}</div>
+</div>
+`;
+
+const secondaryInfo = (text?: string) => text && html`
+<div class="secondary">${text}</div>
+`;
+
+const secondaryInfoTime = (hass: HomeAssistant | undefined, time?: Date) => time && html`
+<div class="secondary">
+    <ha-relative-time .hass="${hass}" .datetime="${time}"></ha-relative-time>
 </div>
 `;
 

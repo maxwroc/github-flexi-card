@@ -36,6 +36,12 @@ export const logError = (msg: string, andThrow?: boolean) => {
 };
 
 /**
+ * Checks whether given value is a number
+ * @param val String value to check
+ */
+ export const isNumber = (value: string | number): boolean => (value !== null && value !== '' && !isNaN(Number(value)));
+
+/**
  * Gets the config value returning first not undefined value passed as arguments
  */
 export const getConfigValue = <T>(...values: T[]): T => values.reduce((prev, curr) => prev !== undefined ? prev : curr);
