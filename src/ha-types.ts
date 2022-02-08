@@ -164,6 +164,8 @@ export interface ToggleActionConfig extends BaseActionConfig {
 export interface HassEntity {
   attributes: { [key: string]: any };
   state: any;
+  last_changed: string;
+  last_updated: string;
 }
 
   export interface HomeAssistant {
