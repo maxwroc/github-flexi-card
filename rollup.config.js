@@ -1,12 +1,13 @@
 import typescript from '@rollup/plugin-typescript';
 import resolve from '@rollup/plugin-node-resolve';
 import cssImports from 'rollup-plugin-import-css';
-import minifyHTML from 'rollup-plugin-minify-html-literals';
+import minifyHTML from 'rollup-plugin-minify-html-literals-v3';
 import serve from 'rollup-plugin-serve';
-import { terser } from 'rollup-plugin-terser';
+import terser from '@rollup/plugin-terser';
 import versionInjector from 'rollup-plugin-version-injector';
-import pkg from './package.json';
+import { readFileSync } from 'fs';
 
+const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
 let targetFileName = pkg.main;
 
 const plugins = [
