@@ -1,7 +1,9 @@
 {
     "compilerOptions": {
         "rootDir": "src",
-        "target": "ES2016",
+        "target": "ES2018",
+        "module": "ESNext",
+        "moduleResolution": "bundler",
         "alwaysStrict": true,
         "noImplicitAny": true,
         "strictNullChecks": true,
