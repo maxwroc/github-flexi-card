@@ -157,7 +157,7 @@ export class GithubRepo extends LitElement {
 
     /**
      * Returns value of the given repo property
-     * @param name Name of the property to return
+     * @param name Name of the property to return (supports dot notation e.g. "latest_release.last_updated" or "latest_release.attributes.tag")
      */
     getRepoInfo(name: string): string | undefined {
 
@@ -170,15 +170,19 @@ export class GithubRepo extends LitElement {
                 return this.repoPath.split("/")[1];
         }
 
-        if (!(name in this.entityMap)) {
+        // Split by dot and extract entity key (e.g. "latest_release.attributes.tag" -> ["latest_release", "attributes", "tag"])
+        const parts = name.split(".");
+        const entityKey = parts.shift()!;
+
+        if (!(entityKey in this.entityMap)) {
             console.log(this.entityMap)
-            logError("Unsupported property: " + name, true);
+            logError("Unsupported property: " + entityKey, true);
         }
 
-        const entityId = this.entityMap[name];
+        const entityId = this.entityMap[entityKey];
 
         if (!entityId) {
-            logError("Entity not found for: " + name);
+            logError("Entity not found for: " + entityKey);
             return;
         }
 
@@ -187,6 +191,11 @@ export class GithubRepo extends LitElement {
         if (!entity) {
             logError("Entity state not found: " + entityId);
             return;
+        }
+
+        if (parts.length) {
+            const value = parts.reduce((obj: any, key) => obj?.[key], entity);
+            return value !== undefined && value !== null ? String(value) : undefined;
         }
 
         return entity.state;

@@ -3,7 +3,7 @@ export const defaultConfig: ICardConfig = {
     repos: [],
     title: "Github repositories",
     name: "{path}",
-    secondary_info: "{latest_release|conditional()}",
+    secondary_info: "{latest_release.attributes.tag|conditional()}",
     url: true,
     attribute_urls: true,
     sort: ["stars", "issues"],

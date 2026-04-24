@@ -128,7 +128,7 @@ Special repo attributes:
 
 KeywordString is a string which can contain special keywords. Keywords are the repo attribute names surrounded by curly brackets. Keywords in the string will be replaced by attribute values.
 
-E.g. `"Card version {latest_release}"` becomes `"Card version v1.5.0"`
+E.g. `"Card version {latest_release.attributes.tag}"` becomes `"Card version v1.5.0"`
 
 #### Converting keyword value
 
@@ -137,7 +137,7 @@ Keywords support simple functions to convert the values
 | Func | Example | Description |
 |:-----|:-----|:-----|
 | `replace([old_string],[new_string])` | `{latest_release\|replace(Git,Proj)}` | Simple replace. E.g. if name contains "Git" string then it will be replaced by "Proj"
-| `conditional()` | `{latest_release\|conditional()}` | If the value doesn't exist nothing is rendered (the default behaviour is to render the keyword)
+| `conditional()` | `{latest_release.attributes.tag\|conditional()}` | If the value doesn't exist nothing is rendered (the default behaviour is to render the keyword)
 | `round([number])` | `{state\|round(2)}` | Rounds the value to number of fractional digits. Not very useful for this card I think (the KString processing code was copied from the other card so I just left this func)
 
 ## Configuration examples
@@ -185,7 +185,7 @@ entities:
   - sensor.home_assistant_v2_db
   - type: 'custom:github-repo'
     repo: maxwroc/battery-state-card
-    secondary_info: 'Released {latest_release}'
+    secondary_info: 'Released {latest_release.attributes.tag}'
     url: true
     attribute_urls: true
     attributes:
@@ -208,7 +208,7 @@ Card-level repo properties are useful when you want to have same settings for al
 ```yaml
 type: 'custom:github-flexi-card'
 title: Card-level repo properties
-secondary_info: 'Released {latest_release}'
+secondary_info: 'Released {latest_release.attributes.tag}'
 url: true
 attribute_urls: true
 attributes:
