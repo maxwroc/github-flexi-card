@@ -1,6 +1,6 @@
 import { HomeAssistant } from "../ha-types";
 import { html, css, LitElement } from "../lit-element";
-import { GithubEntity } from "./entity";
+import { GithubRepo } from "./repo";
 import { defaultConfig } from "../default-config"
 import styles from "./card.css";
 import { getConfigValue, safeGetArray, safeGetConfigArrayOfObjects, safeGetConfigObject } from "../utils";
@@ -9,7 +9,7 @@ export class GithubFlexiCard extends LitElement {
 
     private cardTitle: string | undefined | null;
 
-    private entities: GithubEntity[] = [];
+    private repoElements: GithubRepo[] = [];
 
     private cardSize = 0;
 
@@ -18,6 +18,8 @@ export class GithubFlexiCard extends LitElement {
     private order: number[] = [];
 
     private config: ICardConfig;
+
+    private autoDiscover: boolean = false;
 
     /**
      * CSS for the card
@@ -32,7 +34,7 @@ export class GithubFlexiCard extends LitElement {
     static get properties() {
         return {
             cardTitle: { type: String },
-            entities: { type: Array },
+            repoElements: { type: Array },
             order: { type: Array },
         };
     }
@@ -42,30 +44,29 @@ export class GithubFlexiCard extends LitElement {
      */
     set hass(hass: HomeAssistant) {
 
-        if (this.config.auto) {
+        // Auto-discover GitHub repos when none are configured
+        if (this.autoDiscover) {
+            const discoveredRepos = this.repoElements.map(e => e.repoName);
 
-            const initializedEntities = this.entities.map(e => e.entityId);
-
-            Object.keys(hass.states).filter(entityId => entityId.endsWith(<string>this.config.auto)).forEach(entityId => {
-                // only adding entities which were not initialized already
-                if (!initializedEntities.includes(entityId)) {
-                    this.entities.push(this.getNewInitializedEntity(entityId));
+            Object.values(hass.devices).forEach(device => {
+                if (device.identifiers?.some((id: [string, string]) => id.includes("github"))
+                    && device.name
+                    && !discoveredRepos.includes(device.name)) {
+                    this.repoElements.push(this.getNewInitializedRepo(device.name));
+                    discoveredRepos.push(device.name);
                 }
             });
-
-            // we don't want to process the list more than once
-            this.config.auto = false;
         }
 
-        this.entities.forEach(entity => entity.hass = hass);
+        this.repoElements.forEach(repo => repo.hass = hass);
 
         if (this.sortOptions && this.sortOptions.length) {
             const attrNames = this.sortOptions.map(s => s.by);
-            const values = this.entities.map(e =>
+            const values = this.repoElements.map(e =>
                 attrNames.map(attr => Number(e.getRepoInfo(attr))));
 
             // default order matches the config
-            const defaultOrder = this.entities.map((e, i) => i);
+            const defaultOrder = this.repoElements.map((e, i) => i);
             const newOrder = defaultOrder.sort(
                 (a, b) => values[a].reduce(
                     (prev, curr, i) => prev != 0 ? prev : applySortType(curr, values[b][i], this.sortOptions![i].ascending),
@@ -93,7 +94,7 @@ export class GithubFlexiCard extends LitElement {
 
         this.cardTitle = cardConfig.title;
 
-        const prevEntitiesInConfig = this.config?.entities;
+        const prevReposInConfig = this.config?.repos;
 
         this.config = cardConfig;
 
@@ -103,16 +104,18 @@ export class GithubFlexiCard extends LitElement {
             this.cardSize++;
         }
 
-        const entitiesFromConfig = safeGetConfigArrayOfObjects(cardConfig.entities, "entity");
+        const reposFromConfig = safeGetConfigArrayOfObjects(cardConfig.repos, "repo");
 
-        if (prevEntitiesInConfig != cardConfig.entities) {
+        this.autoDiscover = reposFromConfig.length === 0;
+
+        if (prevReposInConfig != cardConfig.repos) {
             this.order = [];
-            this.entities = entitiesFromConfig.map(entityConf => this.getNewInitializedEntity(entityConf));
+            this.repoElements = reposFromConfig.map(repoConf => this.getNewInitializedRepo(repoConf));
         }
         else {
-            this.entities.forEach((entity, index) => {
-                const entityConf = getEntityConfig(entitiesFromConfig[index] || entity.entityId, cardConfig);
-                entity.setConfig(entityConf);
+            this.repoElements.forEach((repo, index) => {
+                const repoConf = getRepoConfig(reposFromConfig[index] || repo.repoName, cardConfig);
+                repo.setConfig(repoConf);
             });
         }
 
@@ -120,14 +123,14 @@ export class GithubFlexiCard extends LitElement {
         this.sortOptions = sortOptions;
     }
 
-    private getNewInitializedEntity(confEntry: string | IEntityConfig): GithubEntity {
+    private getNewInitializedRepo(confEntry: string | IEntityConfig): GithubRepo {
 
-        const entityConf = getEntityConfig(confEntry, this.config);
+        const repoConf = getRepoConfig(confEntry, this.config);
 
         this.order.push(this.order.length);
 
-        const elem = document.createElement("github-entity") as GithubEntity;
-        elem.setConfig(entityConf);
+        const elem = document.createElement("github-repo") as GithubRepo;
+        elem.setConfig(repoConf);
         this.cardSize++;
 
         return elem;
@@ -151,7 +154,7 @@ export class GithubFlexiCard extends LitElement {
         <ha-card>
             ${this.cardTitle && header(this.cardTitle)}
             <div class="card-content">
-                ${this.order.map(i => html`<div>${this.entities[i]}</div>`)}
+                ${this.order.map(i => html`<div>${this.repoElements[i]}</div>`)}
             </div>
         </ha-card>
         `;
@@ -186,9 +189,9 @@ const header = (title: string) => html`
 /**
  * Converts string entry to proper config obj and applies card-level settings
  */
-const getEntityConfig = (configEntry: IEntityConfig | string, cardConfig: ICardConfig): IEntityConfig => {
+const getRepoConfig = (configEntry: IEntityConfig | string, cardConfig: ICardConfig): IEntityConfig => {
 
-    const entityConfig = safeGetConfigObject(configEntry, "entity");
+    const entityConfig = safeGetConfigObject(configEntry, "repo");
 
     // if property is not defined take the card-level one
     entityConfig.attributes = getConfigValue(entityConfig.attributes, cardConfig.attributes);

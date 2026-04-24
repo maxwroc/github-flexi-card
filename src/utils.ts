@@ -5,6 +5,31 @@ export const printVersion = () => console.info(
 );
 
 /**
+ * Finds the device ID for a given repository name by matching GitHub identifiers
+ * @param hass Home Assistant instance
+ * @param repoName Repository name (e.g. "maxwroc/battery-state-card")
+ */
+export const findDeviceIdByRepo = (hass: { devices: { [id: string]: any } }, repoName: string): string | undefined => {
+    return Object.keys(hass.devices).find(deviceId => {
+        const device = hass.devices[deviceId];
+        return device.name === repoName
+            && device.identifiers?.some((id: [string, string]) => id.includes("github") && id.includes(repoName));
+    });
+};
+
+/**
+ * Finds all entity IDs for a given device ID where the platform is "github"
+ * @param hass Home Assistant instance
+ * @param deviceId Device ID to find entities for
+ */
+export const findEntitiesByDeviceId = (hass: { entities: { [id: string]: any } }, deviceId: string): string[] => {
+    return Object.keys(hass.entities).filter(entityId => {
+        const entry = hass.entities[entityId];
+        return entry.device_id === deviceId && entry.platform === "github";
+    });
+};
+
+/**
  * Cache for messages logged in the console already
  */
 let logCache: IMap<number> = {};
