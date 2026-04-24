@@ -203,6 +203,7 @@ const getRepoConfig = (configEntry: IEntityConfig | string, cardConfig: ICardCon
     entityConfig.secondary_info = getConfigValue(entityConfig.secondary_info, cardConfig.secondary_info);
     entityConfig.url = getConfigValue(entityConfig.url, cardConfig.url);
     entityConfig.compact_view = getConfigValue(entityConfig.compact_view, cardConfig.compact_view, true);
+    entityConfig.debug = getConfigValue(entityConfig.debug, cardConfig.debug);
 
     return entityConfig;
 }

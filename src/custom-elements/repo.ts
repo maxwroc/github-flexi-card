@@ -48,6 +48,8 @@ export class GithubRepo extends LitElement {
 
     private compact_view: boolean = true;
 
+    private debugData: string | undefined;
+
     // View properties end
 
     private config: IEntityConfig;
@@ -79,6 +81,7 @@ export class GithubRepo extends LitElement {
             attributesData: { type: Array },
             action: { type: Function },
             compact_view: { type: Boolean },
+            debugData: { type: String },
         };
     }
 
@@ -134,6 +137,10 @@ export class GithubRepo extends LitElement {
      * Called when element rendering was triggered
      */
     render() {
+        if (this.debugData) {
+            return debugOutput(this.config.repo, this.debugData);
+        }
+
         return html`
         <div class="entity-row${this.compact_view ? " compact-view" : ""}">
             <div class="icon">
@@ -246,6 +253,24 @@ export class GithubRepo extends LitElement {
         if (this.url != this.config.url) {
             this.url = this.config.url;
             this.action = getAction("home", this.url, this.repoPath, keywordProcessor);
+        }
+
+        // debug output
+        if (this.config.debug === true || this.config.debug === this.config.repo) {
+            const debugInfo: IMap<any> = {
+                config: this.config,
+                entityMap: this.entityMap,
+                entities: {},
+            };
+
+            for (const [key, entityId] of Object.entries(this.entityMap)) {
+                debugInfo.entities[key] = this._hass.states[entityId] || null;
+            }
+
+            this.debugData = JSON.stringify(debugInfo, null, 2);
+        }
+        else {
+            this.debugData = undefined;
         }
     }
 
@@ -366,3 +391,29 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
  * Converts attribute name to formatted tooltip text
  */
 const attributeNameToTooltip = (name: string): string => name.substr(0, 1).toUpperCase() + name.substr(1).replace(/_/g, " ");
+
+/**
+ * Renders debug output with show/hide toggle and copy-to-clipboard
+ */
+const debugOutput = (repoName: string, content: string) => {
+    const toggleDebug = (e: MouseEvent) => {
+        const debugContent = (<HTMLElement>(<HTMLElement>e.currentTarget)?.parentElement?.parentElement?.querySelector(".debug_expand"));
+        if (debugContent) {
+            debugContent.style.display = debugContent.style.display === "none" ? "block" : "none";
+        }
+    };
+
+    const copyToClipboard = () => navigator.clipboard?.writeText(content);
+
+    return html`
+    <ha-alert alert-type="warning" title="Debug: ${repoName}">
+        <div>
+            [<a href="javascript:void(0);" @click="${toggleDebug}">Show / hide</a>]
+            ${navigator.clipboard ? html` [<a href="javascript:void(0);" @click="${copyToClipboard}">Copy to clipboard</a>]` : ""}
+        </div>
+        <div class="debug_expand" style="display: none;">
+            <p>Version: [VI]{version}[/VI]</p>
+            <pre style="user-select: all">${content}</pre>
+        </div>
+    </ha-alert>`;
+};

@@ -100,13 +100,13 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 
 ### Attribute names
 
-The GitHub integration creates multiple entities for every repo. The card resolves these entities automatically based on the repository name you provide. Each entity is identified by its `translation_key` (e.g. `stars`, `issues`, `pull_requests`, etc.).
+The GitHub integration creates multiple entities for every repo. The card resolves these entities automatically based on the repository name you provide.
 
 ![image](https://user-images.githubusercontent.com/8268674/152525143-0205c4c3-c79d-4038-b3a9-48753d2ebf0d.png)
 
 I suggest to enable "Diagnostic" entities for your repo(s) on the [devices](https://my.home-assistant.io/redirect/devices/) page.
 
-Available attribute names correspond to the entity translation keys: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `stars`, `watchers`.
+Available attribute names: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `stars`, `watchers`.
 
 Special repo attributes:
 
