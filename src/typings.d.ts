@@ -7,6 +7,7 @@ interface ICardConfig extends Omit<IEntityConfig, "repo"> {
     title?: string,
     repos: ISimplifiedArray<IEntityConfig>,
     sort?: ISimplifiedArray<ISortOptions>,
+    debug?: boolean | string,
 }
 
 interface IEntityConfig {
@@ -20,6 +21,7 @@ interface IEntityConfig {
     attribute_urls?: boolean,
     attribute_color?: string,
     compact_view?: boolean,
+    debug?: boolean | string,
 }
 
 interface IAttribute {

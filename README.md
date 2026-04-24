@@ -100,13 +100,13 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 
 ### Attribute names
 
-The GitHub integration creates multiple entities for every repo. The card resolves these entities automatically based on the repository name you provide. Each entity is identified by its `translation_key` (e.g. `stars`, `issues`, `pull_requests`, etc.).
+The GitHub integration creates multiple entities for every repo. The card resolves these entities automatically based on the repository name you provide.
 
 ![image](https://user-images.githubusercontent.com/8268674/152525143-0205c4c3-c79d-4038-b3a9-48753d2ebf0d.png)
 
 I suggest to enable "Diagnostic" entities for your repo(s) on the [devices](https://my.home-assistant.io/redirect/devices/) page.
 
-Available attribute names correspond to the entity translation keys: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `stars`, `watchers`.
+Available attribute names: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `stars`, `watchers`.
 
 Special repo attributes:
 
@@ -317,6 +317,51 @@ npm run build
 ```
 
 For new features create your branch based on vNext and for fixes based on master.
+
+## Troubleshooting
+
+If the card is not rendering as expected or you want to inspect the data it receives from Home Assistant, you can enable the `debug` option.
+
+### Using the debug config
+
+Add `debug` to your card or repo configuration. When enabled, the normal repo view is replaced with a diagnostic panel showing the resolved config, entity map, and all entity states.
+
+| Value | Effect |
+|:------|:-------|
+| `true` | Shows debug output for **all** repos |
+| `"owner/repo-name"` | Shows debug output only for the **matching** repo |
+
+The debug panel includes a **Show / hide** toggle and a **Copy to clipboard** button so you can easily share the data when reporting issues.
+
+#### Card-level (all repos)
+
+```yaml
+type: 'custom:github-flexi-card'
+debug: true
+repos:
+  - maxwroc/battery-state-card
+  - maxwroc/hideseek-mod
+```
+
+#### Single repo
+
+```yaml
+type: 'custom:github-flexi-card'
+repos:
+  - repo: maxwroc/battery-state-card
+    debug: true
+  - maxwroc/hideseek-mod
+```
+
+#### Specific repo by name (card-level)
+
+```yaml
+type: 'custom:github-flexi-card'
+debug: "maxwroc/battery-state-card"
+repos:
+  - maxwroc/battery-state-card
+  - maxwroc/hideseek-mod
+```
 
 ## Do you like the card?
 
