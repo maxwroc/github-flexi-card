@@ -3,15 +3,14 @@
  */
 declare module "*.css";
 
-interface ICardConfig extends Omit<IEntityConfig, "entity"> {
+interface ICardConfig extends Omit<IEntityConfig, "repo"> {
     title?: string,
-    entities: ISimplifiedArray<IEntityConfig>,
+    repos: ISimplifiedArray<IEntityConfig>,
     sort?: ISimplifiedArray<ISortOptions>,
-    auto?: boolean | string,
 }
 
 interface IEntityConfig {
-    entity: string,
+    repo: string,
     attributes?: ISimplifiedArray<IAttribute>,
     name?: string,
     secondary_info?: string,
