@@ -16,12 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout files
-        uses: actions/checkout@v2
+        uses: actions/checkout@v6
 
       - name: NodeJS setup
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v6
         with:
-          node-version: 14
+          node-version: 22
           registry-url: https://registry.npmjs.org/
 
       - name: Installing dependencies
@@ -32,7 +32,7 @@ jobs:
 
       - name: Create release draft
         id: create_release
-        uses: release-drafter/release-drafter@v5
+        uses: release-drafter/release-drafter@v7
         # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
         with:
            config-name: release-config.yml
