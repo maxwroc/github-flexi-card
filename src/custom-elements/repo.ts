@@ -62,6 +62,8 @@ export class GithubRepo extends LitElement {
 
     private repoPath: string;
 
+    private deviceId: string | undefined;
+
     /**
      * CSS for the card
      */
@@ -96,7 +98,7 @@ export class GithubRepo extends LitElement {
 
         this._hass = hass;
 
-        this.config && this.processHassUpdate();
+        this.processHassUpdate();
     }
 
     /**
@@ -121,6 +123,10 @@ export class GithubRepo extends LitElement {
 
         // we cannot just assign the config because it is immutable and we want to change it
         this.config = JSON.parse(newConfig);
+
+        // Reset cached device/entity data when repo changes
+        this.deviceId = undefined;
+        this.entityMap = {};
 
         this.name = config.name || config.repo;
         config.icon && (this.icon = config.icon);
@@ -151,7 +157,7 @@ export class GithubRepo extends LitElement {
                 ${this.secondaryInfo instanceof Date ? secondaryInfoTime(this._hass, this.secondaryInfo) : secondaryInfo(this.secondaryInfo)}
             </div>
             ${this.attributesData.map(attributeView)}
-        <div>
+        </div>
         `;
     }
 
@@ -175,7 +181,6 @@ export class GithubRepo extends LitElement {
         const entityKey = parts.shift()!;
 
         if (!(entityKey in this.entityMap)) {
-            console.log(this.entityMap)
             logError("Unsupported property: " + entityKey, true);
         }
 
@@ -206,14 +211,17 @@ export class GithubRepo extends LitElement {
      */
     private processHassUpdate() {
 
-        // Resolve device and entities from repo name
-        const deviceId = findDeviceIdByRepo(this._hass, this.config.repo);
-        if (!deviceId) {
+        // Resolve device and entities from repo name (cache deviceId across updates)
+        if (!this.deviceId) {
+            this.deviceId = findDeviceIdByRepo(this._hass, this.config.repo);
+        }
+
+        if (!this.deviceId) {
             logError("[processHassUpdate] Device not found for repo: " + this.config.repo, true);
             return;
         }
 
-        const entityIds = findEntitiesByDeviceId(this._hass, deviceId);
+        const entityIds = findEntitiesByDeviceId(this._hass, this.deviceId);
 
         if (Object.keys(this.entityMap).length === 0) {
             // Build a map of repo property -> entity_id for quick lookup
@@ -378,7 +386,7 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
                 return undefined;
             }
 
-            if (!nameToUrlPathMap[attributeName] === undefined) {
+            if (nameToUrlPathMap[attributeName] === undefined) {
                 logError(`Sorry url cannot be built for "${attributeName}"`);
                 return undefined;
             }
@@ -399,7 +407,7 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
 /**
  * Converts attribute name to formatted tooltip text
  */
-const attributeNameToTooltip = (name: string): string => name.substr(0, 1).toUpperCase() + name.substr(1).replace(/_/g, " ");
+const attributeNameToTooltip = (name: string): string => name.charAt(0).toUpperCase() + name.substring(1).replace(/_/g, " ");
 
 /**
  * Renders debug output with show/hide toggle and copy-to-clipboard

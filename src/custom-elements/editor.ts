@@ -18,11 +18,14 @@ export class GithubFlexiCardEditor extends LitElement {
 
     private _hass!: HomeAssistant;
 
+    private availableRepos: string[] = [];
+
     set hass(hass: HomeAssistant) {
         this._hass = hass;
+        this.availableRepos = this.discoverRepos();
     }
 
-    private getAvailableRepos(): string[] {
+    private discoverRepos(): string[] {
         if (!this._hass?.devices) return [];
         const repos: string[] = [];
         Object.values(this._hass.devices).forEach(device => {
@@ -296,7 +299,7 @@ export class GithubFlexiCardEditor extends LitElement {
                 <label>Repositories</label>
                 <span class="hint">Select repositories to show (leave all unchecked for auto-discovery)</span>
                 <div class="sort-chips">
-                    ${this.getAvailableRepos().map(repo => html`
+                    ${this.availableRepos.map(repo => html`
                         <button
                             class="sort-chip ${repos.some(r => r.repo === repo) ? "active" : ""}"
                             @click=${() => this.onRepoToggled(repo)}
