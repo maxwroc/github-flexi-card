@@ -11,6 +11,10 @@ on:
   #   # Only following types are handled by the action, but one can default to all as well
   #   types: [opened, reopened, synchronize]
 
+permissions:
+  contents: write
+  pull-requests: read
+
 jobs:
   update_release_draft:
     runs-on: ubuntu-latest
@@ -33,12 +37,8 @@ jobs:
       - name: Create release draft
         id: create_release
         uses: release-drafter/release-drafter@v7
-        # (Optional) specify config name to use, relative to .github/. Default: release-drafter.yml
         with:
            config-name: release-config.yml
-           disable-autolabeler: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload release assets
         run: |
