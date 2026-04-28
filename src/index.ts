@@ -1,10 +1,12 @@
 import { GithubFlexiCard } from "./custom-elements/card";
-import { GithubEntity } from "./custom-elements/entity";
+import { GithubFlexiCardEditor } from "./custom-elements/editor";
+import { GithubRepo } from "./custom-elements/repo";
 import { printVersion } from "./utils";
 
 // Registering cards
-customElements.define("github-entity", GithubEntity);
+customElements.define("github-repo", GithubRepo);
 customElements.define("github-flexi-card", GithubFlexiCard);
+customElements.define("github-flexi-card-editor", GithubFlexiCardEditor);
 
 printVersion();
 

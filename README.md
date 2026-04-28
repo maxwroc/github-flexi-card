@@ -10,15 +10,51 @@ Home Assistant card displaying data from [Github integration][ha-gh-integration]
 
 The aim of this card is to show all the data provided by github integration. You can specify what kind of data is shown and where. Entity rows are matching the size of other standard entity rows from other native cards (e.g. height of the row, icon/text margins, font sizes, etc).
 
-This code works as both: card and enrity-row
+This code works as both: card and repo-row
 
-Note: If you plan to use it only as entity row you can consider using the other simpler/smaller code written by benct: [github-entity-row][github-entity-row]
+Note: If you plan to use it only as repo row you can consider using the other simpler/smaller code written by benct: [github-entity-row][github-entity-row]
 
 ![image](https://user-images.githubusercontent.com/8268674/97019224-fad42300-1547-11eb-8153-46c401f50455.png)
 
-## Configuration
+## Breaking changes in v3.0.0
 
-Note: Please **do not change** the original entity IDs otherwise card won't be able to find related entities.
+The card now uses **repository names** instead of entity IDs. This is a fundamental change to how the card is configured.
+
+### What changed
+
+| Removed | Replacement | Notes |
+|:--------|:------------|:------|
+| `entities` (card config) | `repos` | List of repository names (e.g. `maxwroc/battery-state-card`) instead of entity IDs |
+| `entity` (repo config) | `repo` | Repository name instead of entity ID |
+| `auto` (card config) | *(removed)* | Auto-discovery now happens automatically when `repos` is empty |
+| `custom:github-entity` | `custom:github-repo` | Custom element type renamed |
+| Attribute sub-properties (e.g. `latest_release_tag`) | Direct entity keys (e.g. `latest_release`) | Entity attributes are no longer accessed via underscore notation |
+
+### Migration guide
+
+**Before (v2.x):**
+```yaml
+type: 'custom:github-flexi-card'
+title: My repos
+entities:
+  - sensor.maxwroc_battery_state_card_latest_release
+  - entity: sensor.hideseek_mod_latest_release
+    secondary_info: 'Released {latest_release_tag}'
+```
+
+**After (v3.0.0):**
+```yaml
+type: 'custom:github-flexi-card'
+title: My repos
+repos:
+  - maxwroc/battery-state-card
+  - repo: maxwroc/hideseek-mod
+    secondary_info: 'Released {latest_release}'
+```
+
+If `repos` is omitted or empty, all GitHub repos added to Home Assistant will be auto-discovered.
+
+## Configuration
 
 ### Default configuration
 
@@ -28,29 +64,28 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | title | string |  | v0.1.0 | Card header/title text
-| entities | list([Entity](#entity)) \| string |  | v0.1.0 | Collection of entities to display. You can provide simple list of entity_id strings.
-| sort | list([SortOptions](#sort-options)) |  | v1.0.0 | Sort options collection (order matters). Every next sorting option is used fot the next level sorting (if the values of the previous one are same)
-| auto | string \| `false` | `"_latest_release"` | v2.0.0 | Whether to add entities automatically based on the entity ID suffix. You can specify here a different suffix which should be used to find entities
+| repos | list([Repo](#repo)) \| string |  | v3.0.0 | Collection of repos to display. You can provide simple list of repository name strings (e.g. `maxwroc/battery-state-card`). When empty all GitHub repos are auto-discovered.
+| sort | list([SortOptions](#sort-options)) |  | v1.0.0 | Sort options collection (order matters). Every next sorting option is used for the next level sorting (if the values of the previous one are same)
 
-[+ Entity Properties](#Entity-Properties) - applied to all entities
+[+ Repo Properties](#Repo-Properties) - applied to all repos
 
-### Entity
+### Repo
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| entity | string | **(required)** | v0.1.0 | Entity ID e.g. `sensor.my_github_project`
+| repo | string | **(required)** | v3.0.0 | Repository name e.g. `maxwroc/battery-state-card`
 
-[+ Entity Properties](#Entity-Properties)
+[+ Repo Properties](#Repo-Properties)
 
-### Entity Properties
+### Repo Properties
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| name | [KString](#keywordstring) | `friendly_name` | v0.1.0 | Name override
-| secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the entity name
+| name | [KString](#keywordstring) | `"{path}"` | v0.1.0 | Name override
+| secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the repo name
 | attributes | list([Attribute](#attribute)) |  | v0.1.0 | Attributes to display
 | url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
 | attribute_urls | bool |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
 | attribute_color | string | `var(--primary-color)` | v2.0.0 | Color applied to all attributes (icons or labels)
-| icon | string | `"mdi:github"` | v0.2.0 | Override for entity icon
+| icon | string | `"mdi:github"` | v0.2.0 | Override for repo icon
 | icon_color | string |  | v2.0.0 | Icon color override
 | compact_view | bool | `true` | v1.0.0 | When set to `false` big icons (and values) are displayed
 
@@ -65,15 +100,13 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 
 ### Attribute names
 
-When you enable Github Integration it creates couple entities for every repo. Each entity for single repo has a common prefix e.g. "sensor.maxwroc_github_flexi_card_". The last part of the entity name is (what I call here) repo attribute e.g. for "sensor.maxwroc_github_flexi_card_pull_requests" entity the attribute name is "pull_requests".
+The GitHub integration creates multiple entities for every repo. The card resolves these entities automatically based on the repository name you provide.
 
 ![image](https://user-images.githubusercontent.com/8268674/152525143-0205c4c3-c79d-4038-b3a9-48753d2ebf0d.png)
 
 I suggest to enable "Diagnostic" entities for your repo(s) on the [devices](https://my.home-assistant.io/redirect/devices/) page.
 
-It is possible to access **entity** attributes by adding an underscore with the name of the attribute. E.g. if you want to get the `tag` attribute from `*_latest_release` entity you can use `latest_release_tag` as the attribute name in the configuration.
-
-![image](https://user-images.githubusercontent.com/8268674/152525501-efea7c65-0ad6-473a-817c-00c91dab4c46.png)
+Available attribute names: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `stars`, `watchers`.
 
 Special repo attributes:
 
@@ -95,7 +128,7 @@ Special repo attributes:
 
 KeywordString is a string which can contain special keywords. Keywords are the repo attribute names surrounded by curly brackets. Keywords in the string will be replaced by attribute values.
 
-E.g. `"Card version {latest_release_tag}"` becomes `"Card version v1.5.0"`
+E.g. `"Card version {latest_release.attributes.tag}"` becomes `"Card version v1.5.0"`
 
 #### Converting keyword value
 
@@ -104,7 +137,7 @@ Keywords support simple functions to convert the values
 | Func | Example | Description |
 |:-----|:-----|:-----|
 | `replace([old_string],[new_string])` | `{latest_release\|replace(Git,Proj)}` | Simple replace. E.g. if name contains "Git" string then it will be replaced by "Proj"
-| `conditional()` | `{latest_release_tag\|conditional()}` | If the value doesn't exist nothing is rendered (the default behaviour is to render the keyword)
+| `conditional()` | `{latest_release.attributes.tag\|conditional()}` | If the value doesn't exist nothing is rendered (the default behaviour is to render the keyword)
 | `round([number])` | `{state\|round(2)}` | Rounds the value to number of fractional digits. Not very useful for this card I think (the KString processing code was copied from the other card so I just left this func)
 
 ## Configuration examples
@@ -114,10 +147,10 @@ Keywords support simple functions to convert the values
 ```yaml
 type: 'custom:github-flexi-card'
 title: Github projects
-entities:
-  - entity: sensor.maxwroc_battery_state_card_latest_release
-    secondary_info: 'Released {latest_release_tag}'
-    url: "{latest_release_url}" # url taken from attribute
+repos:
+  - repo: maxwroc/battery-state-card
+    secondary_info: 'Released {latest_release}'
+    url: true
     attributes:
       - name: stars
         url: true # default url to /stargazers
@@ -125,25 +158,22 @@ entities:
         url: "https://my.custom.url/path"
       - name: forks
       - name: pull_requests
-        url: "{latest_pull_request_url}" # url taken from attribute
-  - entity: sensor.hideseek_mod
+  - repo: maxwroc/hideseek-mod
     url: true # default url - repo homepage
     attributes:
-      - views
       - stars
       - forks
-  - entity: sensor.urleditorpro
-    name: 'Url Editor Pro (v{latest_release_tag})'
+  - repo: nicolo-ribaudo/tc39-proposal-url-editor-pro
+    name: 'Url Editor Pro (v{latest_release})'
     secondary_info: '{latest_pull_request}'
     attributes:
-      - views
       - stars
       - issues
 ```
 
-### Entity
+### Repo
 
-Note: different type has to be used `custom:github-entity`
+Note: different type has to be used `custom:github-repo`
 
 ![image](https://user-images.githubusercontent.com/8268674/96303544-7be46500-0ff2-11eb-9a86-16af9c52f1d0.png)
 
@@ -153,9 +183,9 @@ title: Displayed as entity
 show_header_toggle: false
 entities:
   - sensor.home_assistant_v2_db
-  - type: 'custom:github-entity'
-    entity: sensor.battery_state_card
-    secondary_info: 'Released {latest_release_tag}'
+  - type: 'custom:github-repo'
+    repo: maxwroc/battery-state-card
+    secondary_info: 'Released {latest_release.attributes.tag}'
     url: true
     attribute_urls: true
     attributes:
@@ -169,29 +199,28 @@ entities:
   - sensor.processor_use
 ```
 
-### Card-level entity properties
+### Card-level repo properties
 
-Card-level entity properties are useful when you want to have same settings for all of the entities.
+Card-level repo properties are useful when you want to have same settings for all of the repos.
 
 ![image](https://user-images.githubusercontent.com/8268674/96266114-30b05f00-0fbe-11eb-9d10-f9b9e5dfc1cf.png)
 
 ```yaml
 type: 'custom:github-flexi-card'
-title: Card-level entity properties
-secondary_info: 'Released {latest_release_tag}'
+title: Card-level repo properties
+secondary_info: 'Released {latest_release.attributes.tag}'
 url: true
 attribute_urls: true
 attributes:
-  - views
   - stars
   - issues
   - watchers
   - forks
   - pull_requests
-entities:
-  - sensor.battery_state_card
-  - sensor.hideseek_mod
-  - sensor.urleditorpro
+repos:
+  - maxwroc/battery-state-card
+  - maxwroc/hideseek-mod
+  - nicolo-ribaudo/tc39-proposal-url-editor-pro
 ```
 
 ### Labels instead of icons
@@ -204,16 +233,14 @@ title: Labels instead of icons
 url: true
 attribute_urls: true
 attributes:
-  - name: views
-    label: Views
   - name: stars
     label: Stars
   - name: issues
     label: Issues
-entities:
-  - sensor.battery_state_card
-  - sensor.hideseek_mod
-  - sensor.urleditorpro
+repos:
+  - maxwroc/battery-state-card
+  - maxwroc/hideseek-mod
+  - nicolo-ribaudo/tc39-proposal-url-editor-pro
 ```
 
 ### Compact view (disabling)
@@ -228,11 +255,11 @@ attribute_urls: true
 attributes:
   - watchers
   - stars
-entities:
-  - sensor.battery_state_card
-  - entity: sensor.hideseek_mod
+repos:
+  - maxwroc/battery-state-card
+  - repo: maxwroc/hideseek-mod
     compact_view: false
-  - sensor.urleditorpro
+  - nicolo-ribaudo/tc39-proposal-url-editor-pro
 ```
 
 ### Sorting
@@ -241,8 +268,8 @@ entities:
 
 ```yaml
 type: 'custom:github-flexi-card'
-title: Sort by starts and forks (asc)
-secondary_info: '{latest_release_tag}'
+title: Sort by stars and forks (asc)
+secondary_info: '{latest_release}'
 url: true
 attribute_urls: true
 attributes:
@@ -254,12 +281,12 @@ sort:
   - by: stars
   - by: forks
     ascending: true
-entities:
-  - sensor.battery_state_card
-  - sensor.hideseek_mod
-  - sensor.github_flexi_card
-  - sensor.urleditorpro
-  - entity: sensor.home_assistant_config
+repos:
+  - maxwroc/battery-state-card
+  - maxwroc/hideseek-mod
+  - maxwroc/github-flexi-card
+  - nicolo-ribaudo/tc39-proposal-url-editor-pro
+  - repo: maxwroc/homeassistant
     secondary_info: null
 ```
 
@@ -290,6 +317,51 @@ npm run build
 ```
 
 For new features create your branch based on vNext and for fixes based on master.
+
+## Troubleshooting
+
+If the card is not rendering as expected or you want to inspect the data it receives from Home Assistant, you can enable the `debug` option.
+
+### Using the debug config
+
+Add `debug` to your card or repo configuration. When enabled, the normal repo view is replaced with a diagnostic panel showing the resolved config, entity map, and all entity states.
+
+| Value | Effect |
+|:------|:-------|
+| `true` | Shows debug output for **all** repos |
+| `"owner/repo-name"` | Shows debug output only for the **matching** repo |
+
+The debug panel includes a **Show / hide** toggle and a **Copy to clipboard** button so you can easily share the data when reporting issues.
+
+#### Card-level (all repos)
+
+```yaml
+type: 'custom:github-flexi-card'
+debug: true
+repos:
+  - maxwroc/battery-state-card
+  - maxwroc/hideseek-mod
+```
+
+#### Single repo
+
+```yaml
+type: 'custom:github-flexi-card'
+repos:
+  - repo: maxwroc/battery-state-card
+    debug: true
+  - maxwroc/hideseek-mod
+```
+
+#### Specific repo by name (card-level)
+
+```yaml
+type: 'custom:github-flexi-card'
+debug: "maxwroc/battery-state-card"
+repos:
+  - maxwroc/battery-state-card
+  - maxwroc/hideseek-mod
+```
 
 ## Do you like the card?
 

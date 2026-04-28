@@ -65,7 +65,7 @@ const availableProcessors: IMap<IProcessorCtor> = {
             decimalPlaces = 0;
         }
 
-        return val => val !==undefined ? parseFloat(val).toFixed(decimalPlaces) : undefined;
+        return val => val !== undefined ? parseFloat(val).toFixed(decimalPlaces) : undefined;
     },
     "conditional": (params) => {
         return val => val !== undefined ? val : "";
