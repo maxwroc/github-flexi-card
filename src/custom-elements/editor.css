@@ -1,0 +1,84 @@
+.editor-container {
+    padding: 16px;
+}
+
+.editor-container .form-row {
+    margin-bottom: 16px;
+}
+
+.editor-container .form-row label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: var(--primary-text-color);
+}
+
+.editor-container .form-row .hint {
+    display: block;
+    font-size: 0.85em;
+    color: var(--secondary-text-color);
+    margin-top: 2px;
+    margin-bottom: 8px;
+}
+
+.editor-container ha-textfield {
+    display: block;
+    width: 100%;
+}
+
+.editor-container .switch-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.editor-container .switch-row .switch-label {
+    font-weight: 500;
+    color: var(--primary-text-color);
+}
+
+.editor-container .sort-chip.dragging {
+    opacity: 0.4;
+}
+
+.editor-container .sort-chip.active[draggable="true"] {
+    cursor: grab;
+}
+
+.editor-container .sort-chip.active[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+.editor-container .sort-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 8px;
+}
+
+.editor-container .sort-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 16px;
+    border: 1px solid var(--divider-color);
+    font-size: 0.9em;
+    cursor: pointer;
+    user-select: none;
+    background: none;
+    color: var(--primary-text-color);
+}
+
+.editor-container .sort-chip.active {
+    background: var(--primary-color);
+    color: var(--text-primary-color, #fff);
+    border-color: var(--primary-color);
+}
+
+.editor-container .version {
+    text-align: right;
+    font-size: 0.8em;
+    color: var(--secondary-text-color);
+    margin-top: 8px;
+}

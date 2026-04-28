@@ -21,6 +21,17 @@ export class GithubFlexiCard extends LitElement {
 
     private autoDiscover: boolean = false;
 
+    static getConfigElement() {
+        return document.createElement("github-flexi-card-editor");
+    }
+
+    static getStubConfig() {
+        return {
+            title: "Github repositories",
+            repos: [],
+        };
+    }
+
     /**
      * CSS for the card
      */
