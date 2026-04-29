@@ -49,7 +49,7 @@ title: My repos
 repos:
   - maxwroc/battery-state-card
   - repo: maxwroc/hideseek-mod
-    secondary_info: 'Released {latest_release}'
+    secondary_info: 'Released {latest_release.attributes.tag}'
 ```
 
 If `repos` is omitted or empty, all GitHub repos added to Home Assistant will be auto-discovered.
