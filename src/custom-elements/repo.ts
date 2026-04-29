@@ -1,7 +1,7 @@
 import { HomeAssistant } from "../ha-types";
 import { html, css, LitElement } from "../lit-element";
 import { RichStringProcessor } from "../rich-string-processor";
-import { logError, getConfigValue, safeGetConfigArrayOfObjects, resetLogCache, isNumber, findDeviceIdByRepo, findEntitiesByDeviceId } from "../utils";
+import { logError, getConfigValue, safeGetConfigArrayOfObjects, resetLogCache, findDeviceIdByRepo, findEntitiesByDeviceId } from "../utils";
 import styles from "./repo.css";
 
 interface IAttributeViewData {
@@ -21,7 +21,8 @@ const translationKeyToEntityKey: Record<string, string> = {
     "latest_pull_request": "latest_pull_request",
     "latest_release": "latest_release",
     "latest_tag": "latest_tag",
-    "merged_pulls_count": "pull_requests",
+    "pulls_count": "pull_requests",
+    "merged_pulls_count": "merged_pull_requests",
     "stargazers_count": "stars",
     "subscribers_count": "watchers",
     "discussions_count": "discussions",
@@ -227,9 +228,17 @@ export class GithubRepo extends LitElement {
             // Build a map of repo property -> entity_id for quick lookup
             for (const entityId of entityIds) {
                 const translationKey = this._hass.entities[entityId]?.translation_key;
-                if (translationKey && translationKeyToEntityKey[translationKey]) {
-                    const key = translationKeyToEntityKey[translationKey];
+                if (translationKey) {
+                    let key = translationKeyToEntityKey[translationKey];
+                    if (!key) {
+                        key = "NotSupported:" + translationKey;
+                        logError("[processHassUpdate] Unsupported translation key: " + translationKey);
+                    }
+
                     this.entityMap[key] = entityId;
+                }
+                else {
+                    logError("[processHassUpdate] Entity with missing translation key: " + entityId);
                 }
             }
         }
@@ -345,9 +354,16 @@ const nameToIconMap: IMap<string> = {
     "forks": "mdi:source-fork",
     "issues": "mdi:alert-circle-outline",
     "pull_requests": "mdi:source-pull",
+    "merged_pull_requests": "mdi:source-merge",
     "stars": "mdi:star",
+    "latest_commit": "mdi:source-commit",
+    "latest_issue": "mdi:alert-circle-outline",
+    "latest_pull_request": "mdi:source-pull",
     "latest_release": "mdi:tag-outline",
+    "latest_tag": "mdi:tag-outline",
     "watchers": "mdi:glasses",
+    "discussions": "mdi:forum",
+    "latest_discussion": "mdi:forum",
     // "clones": "mdi:download-outline",
     // "clones_unique": "mdi:download-outline",
     // "views": "mdi:eye",
@@ -361,9 +377,16 @@ const nameToUrlPathMap: IMap<string> = {
     "forks": "network/members",
     "issues": "issues",
     "pull_requests": "pulls",
+    "merged_pull_requests": "pulls?q=is%3Apr+is%3Amerged",
     "stars": "stargazers",
+    "latest_commit": "commits",
+    "latest_issue": "issues",
+    "latest_pull_request": "pulls",
     "latest_release": "releases",
+    "latest_tag": "tags",
     "watchers": "watchers",
+    "discussions": "discussions",
+    "latest_discussion": "discussions",
     // "clones": "graphs/traffic",
     // "clones_unique": "graphs/traffic",
     // "views": "graphs/traffic",

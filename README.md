@@ -106,7 +106,7 @@ The GitHub integration creates multiple entities for every repo. The card resolv
 
 I suggest to enable "Diagnostic" entities for your repo(s) on the [devices](https://my.home-assistant.io/redirect/devices/) page.
 
-Available attribute names: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `stars`, `watchers`.
+Available attribute names: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `merged_pull_requests`, `stars`, `watchers`, `discussions`, `latest_discussion`, `latest_tag`.
 
 Special repo attributes:
 
