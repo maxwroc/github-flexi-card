@@ -8,17 +8,17 @@ Home Assistant card displaying data from [Github integration][ha-gh-integration]
 
 ## Overview
 
-The aim of this card is to show all the data provided by github integration. You can specify what kind of data is shown and where. Entity rows are matching the size of other standard entity rows from other native cards (e.g. height of the row, icon/text margins, font sizes, etc).
+This card displays all the data provided by the GitHub integration. You can choose what data is shown and where it appears. Entity rows match the dimensions of standard rows from native cards (e.g. row height, icon/text margins, font sizes, etc.).
 
-This code works as both: card and repo-row
+It works as both a standalone card (`customn:github-flexi-card`) and a entity row (`custom:github-repo`).
 
-Note: If you plan to use it only as repo row you can consider using the other simpler/smaller code written by benct: [github-entity-row][github-entity-row]
+Note: If you only need a entity row, consider the simpler/lighter alternative by benct: [github-entity-row][github-entity-row]
 
 ![image](https://user-images.githubusercontent.com/8268674/97019224-fad42300-1547-11eb-8153-46c401f50455.png)
 
 ## Breaking changes in v3.0.0
 
-The card now uses **repository names** instead of entity IDs. This is a fundamental change to how the card is configured.
+The card now uses **repository names** instead of entity IDs — a fundamental change to how the card is configured.
 
 ### What changed
 
@@ -64,8 +64,8 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
 | title | string |  | v0.1.0 | Card header/title text
-| repos | list([Repo](#repo)) \| string |  | v3.0.0 | Collection of repos to display. You can provide simple list of repository name strings (e.g. `maxwroc/battery-state-card`). When empty all GitHub repos are auto-discovered.
-| sort | list([SortOptions](#sort-options)) |  | v1.0.0 | Sort options collection (order matters). Every next sorting option is used for the next level sorting (if the values of the previous one are same)
+| repos | list([Repo](#repo)) \| string |  | v3.0.0 | Repos to display. Accepts a list of repository name strings (e.g. `maxwroc/battery-state-card`). When empty, all GitHub repos are auto-discovered.
+| sort | list([SortOptions](#sort-options)) |  | v1.0.0 | Sort options (order matters). Each subsequent option acts as a tiebreaker when values from the previous one are equal.
 
 [+ Repo Properties](#Repo-Properties) - applied to all repos
 
@@ -81,40 +81,32 @@ Please see the following file: [default-config.ts](https://github.com/maxwroc/gi
 |:-----|:-----|:-----|:-----|:-----|
 | name | [KString](#keywordstring) | `"{path}"` | v0.1.0 | Name override
 | secondary_info | [KString](#keywordstring) |  | v0.1.0 | String to display underneath the repo name
-| attributes | list([Attribute](#attribute)) |  | v0.1.0 | Attributes to display
-| url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (when `true` is used the target url becomes repo homepage)
-| attribute_urls | bool |  | v0.2.0 | When set to `true` turns on default urls for all the displayed attributes
+| attributes | list([Attribute](#attribute)) |  | v0.1.0 | Repository attributes/entities to display
+| url | [KString](#keywordstring) \| bool |  | v0.2.0 | URL to open on click/tap. When set to `true`, links to the repo homepage.
+| attribute_urls | bool |  | v0.2.0 | When `true`, enables default URLs for all displayed attributes
 | attribute_color | string | `var(--primary-color)` | v2.0.0 | Color applied to all attributes (icons or labels)
 | icon | string | `"mdi:github"` | v0.2.0 | Override for repo icon
 | icon_color | string |  | v2.0.0 | Icon color override
-| compact_view | bool | `true` | v1.0.0 | When set to `false` big icons (and values) are displayed
+| compact_view | bool | `true` | v1.0.0 | When `false`, displays larger icons and values
 
 ### Attribute
 | Name | Type | Default | Since | Description |
 |:-----|:-----|:-----|:-----|:-----|
-| name | string | **(required)** | v0.1.0 | Name of the attribute
+| name | string | **(required)** | v0.1.0 | Name of the attribute (please check the list below)
 | icon | string |  | v0.1.0 | Icon override (there are default icons for most of the available attributes)
-| url | [KString](#keywordstring) \| bool |  | v0.2.0 | Url to open on click/tap. (there are default urls for most of the available attributes, so you can just use `true`)
+| url | [KString](#keywordstring) \| bool |  | v0.2.0 | URL to open on click/tap. Most attributes have default URLs, so you can simply use `true`.
 | label | [KString](#keywordstring) |  | v0.5.0 | Label/text which will be shown instead of the icon
 | color | string | `var(--primary-color)` | v2.0.0 | Icon / label color
 
 ### Attribute names
 
-The GitHub integration creates multiple entities for every repo. The card resolves these entities automatically based on the repository name you provide.
-
-![image](https://user-images.githubusercontent.com/8268674/152525143-0205c4c3-c79d-4038-b3a9-48753d2ebf0d.png)
-
-I suggest to enable "Diagnostic" entities for your repo(s) on the [devices](https://my.home-assistant.io/redirect/devices/) page.
+The GitHub integration creates multiple entities per repo. Since entity IDs can be translated, the card cannot rely on them. Instead, it automatically detects entities based on their `translation_key` value, which is language-agnostic. Because of this, there is a fixed list of supported repository attributes/entities you can use.
 
 Available attribute names: `forks`, `issues`, `latest_commit`, `latest_issue`, `latest_pull_request`, `latest_release`, `pull_requests`, `merged_pull_requests`, `stars`, `watchers`, `discussions`, `latest_discussion`, `latest_tag`.
 
-Special repo attributes:
+![image](https://user-images.githubusercontent.com/8268674/152525143-0205c4c3-c79d-4038-b3a9-48753d2ebf0d.png)
 
-| Name | Description |
-|:-----|:-----|
-| path | Repository path e.g. `maxwroc/github-flexi-card` |
-| owner | First part of repository path e.g. `maxwroc` for the `maxwroc/github-flexi-card` repo
-| repo | Second part of repository path e.g. `github-flexi-card` for the `maxwroc/github-flexi-card` repo
+I recommend enabling all "Diagnostic" entities for your repo(s) on the [devices](https://my.home-assistant.io/redirect/devices/) page.
 
 ### Sort options
 
@@ -126,9 +118,17 @@ Special repo attributes:
 
 ### KeywordString
 
-KeywordString is a string which can contain special keywords. Keywords are the repo attribute names surrounded by curly brackets. Keywords in the string will be replaced by attribute values.
+A KeywordString is a string that can contain special keywords — repo attribute names enclosed in curly brackets. These keywords are replaced with their corresponding attribute values at render time.
 
 E.g. `"Card version {latest_release.attributes.tag}"` becomes `"Card version v1.5.0"`
+
+Special repo attributes available in KeywordStrings
+
+| Name | Description |
+|:-----|:-----|
+| path | Repository path e.g. `maxwroc/github-flexi-card` |
+| owner | First part of repository path e.g. `maxwroc` for the `maxwroc/github-flexi-card` repo
+| repo | Second part of repository path e.g. `github-flexi-card` for the `maxwroc/github-flexi-card` repo
 
 #### Converting keyword value
 
@@ -136,9 +136,9 @@ Keywords support simple functions to convert the values
 
 | Func | Example | Description |
 |:-----|:-----|:-----|
-| `replace([old_string],[new_string])` | `{latest_release\|replace(Git,Proj)}` | Simple replace. E.g. if name contains "Git" string then it will be replaced by "Proj"
-| `conditional()` | `{latest_release.attributes.tag\|conditional()}` | If the value doesn't exist nothing is rendered (the default behaviour is to render the keyword)
-| `round([number])` | `{state\|round(2)}` | Rounds the value to number of fractional digits. Not very useful for this card I think (the KString processing code was copied from the other card so I just left this func)
+| `replace([old_string],[new_string])` | `{latest_release\|replace(Git,Proj)}` | Replaces occurrences of `old_string` with `new_string` in the value
+| `conditional()` | `{latest_release.attributes.tag\|conditional()}` | Renders nothing if the value doesn't exist (by default, the raw keyword is shown)
+| `round([number])` | `{state\|round(2)}` | Rounds the value to the specified number of decimal places
 
 ## Configuration examples
 
@@ -201,7 +201,7 @@ entities:
 
 ### Card-level repo properties
 
-Card-level repo properties are useful when you want to have same settings for all of the repos.
+Card-level repo properties let you apply the same settings to all repos at once.
 
 ![image](https://user-images.githubusercontent.com/8268674/96266114-30b05f00-0fbe-11eb-9d10-f9b9e5dfc1cf.png)
 
@@ -292,9 +292,9 @@ repos:
 
 ## How to install?
 
-Install via HACS. Look for the card in Frontend plugins collection.
+Install via HACS — look for the card in the Frontend plugins collection.
 
-If you have a YAML mode remember to add resource entry for the js bundle in ui-lovelace.yaml:
+If you use YAML mode, remember to add a resource entry for the JS bundle in `ui-lovelace.yaml`:
 
 ```yaml
 resources:
@@ -320,11 +320,11 @@ For new features create your branch based on vNext and for fixes based on master
 
 ## Troubleshooting
 
-If the card is not rendering as expected or you want to inspect the data it receives from Home Assistant, you can enable the `debug` option.
+If the card isn't rendering as expected or you want to inspect the data it receives from Home Assistant, enable the `debug` option.
 
 ### Using the debug config
 
-Add `debug` to your card or repo configuration. When enabled, the normal repo view is replaced with a diagnostic panel showing the resolved config, entity map, and all entity states.
+Add `debug` to your card or repo configuration. When enabled, the repo view is replaced with a diagnostic panel showing the resolved config, entity map, and all entity states.
 
 | Value | Effect |
 |:------|:-------|
@@ -365,7 +365,7 @@ repos:
 
 ## Do you like the card?
 
-Don't "buy me a coffee", just star it on github! It will be enough to let me know that you like it and definitely will give me motivation boost to continue working on it and other cards.
+Don't "buy me a coffee" — just star it on GitHub! That's enough to let me know you like it and will definitely motivate me to keep working on it and other cards.
 
 ## My other HA related repos
 [battery-state-card](https://github.com/maxwroc/battery-state-card) | [homeassistant-config](https://github.com/maxwroc/homeassistant) | [lovelace-card-boilerplate](https://github.com/maxwroc/lovelace-card-boilerplate)
