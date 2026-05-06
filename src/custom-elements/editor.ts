@@ -92,11 +92,20 @@ export class GithubFlexiCardEditor extends LitElement {
     private draggedItem: string | null = null;
     private dragGroup: string | null = null;
 
+    private getConfiguredAttributes(): IAttribute[] {
+        return safeGetConfigArrayOfObjects(this.config.attributes, "name");
+    }
+
     private onAttributeToggled(attr: string) {
-        const current = safeGetArray(this.config.attributes) as string[];
-        const updated = current.includes(attr)
-            ? current.filter(a => a !== attr)
-            : [...current, attr];
+        const current = this.getConfiguredAttributes();
+        const existing = current.findIndex(a => a.name === attr);
+        if (existing !== -1) {
+            current.splice(existing, 1);
+        } else {
+            current.push({ name: attr });
+        }
+
+        const updated = current;
         this.config = { ...this.config, attributes: updated };
         this.fireConfigChanged();
     }
@@ -124,12 +133,12 @@ export class GithubFlexiCardEditor extends LitElement {
         if (!this.draggedItem || this.draggedItem === targetItem || this.dragGroup !== group) return;
 
         if (group === "attributes") {
-            const current = [...safeGetArray(this.config.attributes) as string[]];
-            const fromIndex = current.indexOf(this.draggedItem);
-            const toIndex = current.indexOf(targetItem);
+            const current = [...this.getConfiguredAttributes()];
+            const fromIndex = current.findIndex(a => a.name === this.draggedItem);
+            const toIndex = current.findIndex(a => a.name === targetItem);
             if (fromIndex === -1 || toIndex === -1) return;
-            current.splice(fromIndex, 1);
-            current.splice(toIndex, 0, this.draggedItem);
+            const [moved] = current.splice(fromIndex, 1);
+            current.splice(toIndex, 0, moved);
             this.config = { ...this.config, attributes: current };
         } else if (group === "sort") {
             const current = [...safeGetArray(this.config.sort).map(s => {
@@ -182,7 +191,7 @@ export class GithubFlexiCardEditor extends LitElement {
             return html``;
         }
 
-        const selectedAttributes = safeGetArray(this.config.attributes) as string[];
+        const selectedAttributes = this.getConfiguredAttributes().map(a => a.name);
         const availableAttributes = AVAILABLE_ATTRIBUTE_KEYS;
         const selectedSort = safeGetArray(this.config.sort).map(s => {
             const obj = safeGetConfigObject(s, "by");
