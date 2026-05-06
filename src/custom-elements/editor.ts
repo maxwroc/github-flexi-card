@@ -2,15 +2,8 @@ import { html, css, LitElement } from "../lit-element";
 import { HomeAssistant } from "../ha-types";
 import { defaultConfig } from "../default-config";
 import { safeGetArray, safeGetConfigArrayOfObjects, safeGetConfigObject } from "../utils";
+import { AVAILABLE_ATTRIBUTE_KEYS, SORTABLE_ATTRIBUTE_KEYS, getAttributeMetadata } from "../attribute-metadata";
 import styles from "./editor.css";
-
-const AVAILABLE_ATTRIBUTES = [
-    "stars",
-    "issues",
-    "pull_requests",
-    "forks",
-    "watchers",
-];
 
 export class GithubFlexiCardEditor extends LitElement {
 
@@ -180,16 +173,22 @@ export class GithubFlexiCardEditor extends LitElement {
         this.fireConfigChanged();
     }
 
+    private getAttributeText(attr: string): string {
+        return getAttributeMetadata(attr)?.text || attr.replace(/_/g, " ");
+    }
+
     render() {
         if (!this.config) {
             return html``;
         }
 
         const selectedAttributes = safeGetArray(this.config.attributes) as string[];
+        const availableAttributes = AVAILABLE_ATTRIBUTE_KEYS;
         const selectedSort = safeGetArray(this.config.sort).map(s => {
             const obj = safeGetConfigObject(s, "by");
             return (typeof s === "string" ? s : obj.by) as string;
         });
+        const sortableAttributes = SORTABLE_ATTRIBUTE_KEYS;
         const repos = safeGetConfigArrayOfObjects(this.config.repos, "repo");
         const urlEnabled = !!this.config.url;
         const attrUrlsEnabled = !!this.config.attribute_urls;
@@ -260,13 +259,13 @@ export class GithubFlexiCardEditor extends LitElement {
                             @dragover=${(e: DragEvent) => this.onDragOver(e)}
                             @drop=${(e: DragEvent) => this.onDrop(e, attr, "attributes")}
                             @click=${() => this.onAttributeToggled(attr)}
-                        >${attr.replace(/_/g, " ")}</button>
+                        >${this.getAttributeText(attr)}</button>
                     `)}
-                    ${AVAILABLE_ATTRIBUTES.filter(a => !selectedAttributes.includes(a)).map(attr => html`
+                    ${availableAttributes.filter(a => !selectedAttributes.includes(a)).map(attr => html`
                         <button
                             class="sort-chip"
                             @click=${() => this.onAttributeToggled(attr)}
-                        >${attr.replace(/_/g, " ")}</button>
+                        >${this.getAttributeText(attr)}</button>
                     `)}
                 </div>
             </div>
@@ -284,13 +283,13 @@ export class GithubFlexiCardEditor extends LitElement {
                             @dragover=${(e: DragEvent) => this.onDragOver(e)}
                             @drop=${(e: DragEvent) => this.onDrop(e, attr, "sort")}
                             @click=${() => this.onSortToggled(attr)}
-                        >${attr.replace(/_/g, " ")}</button>
+                        >${this.getAttributeText(attr)}</button>
                     `)}
-                    ${AVAILABLE_ATTRIBUTES.filter(a => !selectedSort.includes(a)).map(attr => html`
+                    ${sortableAttributes.filter(a => !selectedSort.includes(a)).map(attr => html`
                         <button
                             class="sort-chip"
                             @click=${() => this.onSortToggled(attr)}
-                        >${attr.replace(/_/g, " ")}</button>
+                        >${this.getAttributeText(attr)}</button>
                     `)}
                 </div>
             </div>

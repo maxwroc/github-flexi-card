@@ -2,6 +2,7 @@ import { HomeAssistant } from "../ha-types";
 import { html, css, LitElement } from "../lit-element";
 import { RichStringProcessor } from "../rich-string-processor";
 import { logError, getConfigValue, safeGetConfigArrayOfObjects, resetLogCache, findDeviceIdByRepo, findEntitiesByDeviceId } from "../utils";
+import { TRANSLATION_KEY_TO_ENTITY_KEY, getAttributeMetadata } from "../attribute-metadata";
 import styles from "./repo.css";
 
 interface IAttributeViewData {
@@ -12,22 +13,6 @@ interface IAttributeViewData {
     action?: Function,
     color?: string,
 }
-
-const translationKeyToEntityKey: Record<string, string> = {
-    "forks_count": "forks",
-    "issues_count": "issues",
-    "latest_commit": "latest_commit",
-    "latest_issue": "latest_issue",
-    "latest_pull_request": "latest_pull_request",
-    "latest_release": "latest_release",
-    "latest_tag": "latest_tag",
-    "pulls_count": "pull_requests",
-    "merged_pulls_count": "merged_pull_requests",
-    "stargazers_count": "stars",
-    "subscribers_count": "watchers",
-    "discussions_count": "discussions",
-    "latest_discussion": "latest_discussion",
-};
 
 export class GithubRepo extends LitElement {
 
@@ -181,14 +166,10 @@ export class GithubRepo extends LitElement {
         const parts = name.split(".");
         const entityKey = parts.shift()!;
 
-        if (!(entityKey in this.entityMap)) {
-            logError("Unsupported property: " + entityKey, true);
-        }
-
         const entityId = this.entityMap[entityKey];
 
         if (!entityId) {
-            logError("Entity not found for: " + entityKey);
+            logError(`Entity not found for: ${entityKey} (${this.repoPath})`);
             return;
         }
 
@@ -229,7 +210,7 @@ export class GithubRepo extends LitElement {
             for (const entityId of entityIds) {
                 const translationKey = this._hass.entities[entityId]?.translation_key;
                 if (translationKey) {
-                    let key = translationKeyToEntityKey[translationKey];
+                    let key = TRANSLATION_KEY_TO_ENTITY_KEY[translationKey];
                     if (!key) {
                         key = "NotSupported:" + translationKey;
                         logError("[processHassUpdate] Unsupported translation key: " + translationKey);
@@ -308,10 +289,11 @@ export class GithubRepo extends LitElement {
         return safeGetConfigArrayOfObjects(this.config.attributes, "name")
             .map(a => {
                 const val = this.getRepoInfo(a.name);
+                const metadata = getAttributeMetadata(a.name);
                 return <IAttributeViewData>{
-                    value: val === undefined ? "?" : val,
-                    tooltip: attributeNameToTooltip(a.name),
-                    icon: a.icon || nameToIconMap[a.name],
+                    value: val === undefined || val === "unavailable" ? "?" : val,
+                    tooltip: metadata?.text || a.name,
+                    icon: a.icon || metadata?.icon,
                     label: a.label && keywordProcessor.process(a.label),
                     color: a.color || this.config.attribute_color || "var(--primary-color)",
                     action: getAction(
@@ -348,53 +330,6 @@ const secondaryInfoTime = (hass: HomeAssistant | undefined, time?: Date) => time
 `;
 
 /**
- * Attribute name to icon map
- */
-const nameToIconMap: IMap<string> = {
-    "forks": "mdi:source-fork",
-    "issues": "mdi:alert-circle-outline",
-    "pull_requests": "mdi:source-pull",
-    "merged_pull_requests": "mdi:source-merge",
-    "stars": "mdi:star",
-    "latest_commit": "mdi:source-commit",
-    "latest_issue": "mdi:alert-circle-outline",
-    "latest_pull_request": "mdi:source-pull",
-    "latest_release": "mdi:tag-outline",
-    "latest_tag": "mdi:tag-outline",
-    "watchers": "mdi:glasses",
-    "discussions": "mdi:forum",
-    "latest_discussion": "mdi:forum",
-    // "clones": "mdi:download-outline",
-    // "clones_unique": "mdi:download-outline",
-    // "views": "mdi:eye",
-    // "views_unique": "mdi:eye-check",
-}
-
-/**
- * Attribute name to url path map
- */
-const nameToUrlPathMap: IMap<string> = {
-    "forks": "network/members",
-    "issues": "issues",
-    "pull_requests": "pulls",
-    "merged_pull_requests": "pulls?q=is%3Apr+is%3Amerged",
-    "stars": "stargazers",
-    "latest_commit": "commits",
-    "latest_issue": "issues",
-    "latest_pull_request": "pulls",
-    "latest_release": "releases",
-    "latest_tag": "tags",
-    "watchers": "watchers",
-    "discussions": "discussions",
-    "latest_discussion": "discussions",
-    // "clones": "graphs/traffic",
-    // "clones_unique": "graphs/traffic",
-    // "views": "graphs/traffic",
-    // "views_unique": "graphs/traffic",
-    "home": ""
-}
-
-/**
  * Creates action for clickable elements
  */
 const getAction = (attributeName: string, url: boolean | string | undefined, path: string, keywordProcessor: RichStringProcessor): Function | undefined => {
@@ -409,12 +344,14 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
                 return undefined;
             }
 
-            if (nameToUrlPathMap[attributeName] === undefined) {
+            const urlPath = getAttributeMetadata(attributeName)?.urlPath;
+
+            if (urlPath === undefined) {
                 logError(`Sorry url cannot be built for "${attributeName}"`);
                 return undefined;
             }
 
-            return () => window.open(`https://github.com/${path}/${nameToUrlPathMap[attributeName]}`);
+            return () => window.open(`https://github.com/${path}/${urlPath}`);
         case "string":
             return () => window.open(keywordProcessor.process(url));
         case "undefined":
@@ -426,11 +363,6 @@ const getAction = (attributeName: string, url: boolean | string | undefined, pat
 
     return undefined;
 }
-
-/**
- * Converts attribute name to formatted tooltip text
- */
-const attributeNameToTooltip = (name: string): string => name.charAt(0).toUpperCase() + name.substring(1).replace(/_/g, " ");
 
 /**
  * Renders debug output with show/hide toggle and copy-to-clipboard
